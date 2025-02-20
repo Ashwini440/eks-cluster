@@ -77,7 +77,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>com.assy.MainApplication</mainClass> 
+              <mainClass>com.assy.App</mainClass> 
             </manifest>
           </archive>
         </configuration>
