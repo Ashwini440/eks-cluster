@@ -1,3 +1,4 @@
+package com.assy.com;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,13 +10,13 @@ public class App {
     public static void main(String[] args) {
         SpringApplication.run(App.class, args);
     }
-
-    @RestController
-    @RequestMapping("/")
-    class HelloController {
-        @GetMapping
-        public String hello() {
-            return "Hello, World!";
-        }
+}
+@RestController
+@RequestMapping("/")
+public class HelloController {
+    @GetMapping
+    public String hello() {
+        return "Hello, World!";
+        
     }
 }
