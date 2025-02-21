@@ -11,4 +11,5 @@ COPY target/cluster_jar-1.0-SNAPSHOT.jar /app/cluster_jar-1.0-SNAPSHOT.jar
 EXPOSE 8081
 
 # Step 5: Command to run the Spring Boot application when the container starts
-ENTRYPOINT ["java", "-jar", "cluster_jar-1.0-SNAPSHOT.jar"]
+#ENTRYPOINT ["java", "-jar", "cluster_jar-1.0-SNAPSHOT.jar"]
+CMD ["sh", "-c", "while true; do java -jar /app/cluster_jar-1.0-SNAPSHOT.jar; sleep 5; done"]
