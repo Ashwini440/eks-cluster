@@ -22,3 +22,18 @@ spec:
           image: asamaswini/ocean:v2
           ports:
             - containerPort: 8082
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ocean-nodeport
+spec:
+  selector:
+    app: ocean
+    version: v2
+  ports:
+    - port: 80
+      targetPort: 8081
+      nodePort: 30080
+  type: NodePort
