@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: ocean-container
-          image: asamaswini/ocean:v1
+          image: asamaswini/ocean:v11
           ports:
             - containerPort: 8081
           readinessProbe:
