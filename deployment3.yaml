@@ -7,10 +7,12 @@ spec:
   selector:
     matchLabels:
       app: ocean
+      version: v3
   template:
     metadata:
       labels:
         app: ocean
+        version: v3
     spec:
       containers:
         - name: ocean-v3
