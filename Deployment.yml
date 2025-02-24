@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: first-deployment  
+spec:
+  replicas: 1  
+  selector:
+    matchLabels:  
+      app: ocean-image
+  template: 
+    metadata:
+      labels:
+        app: ocean-image
+    spec:
+      containers:  
+        - name: ocean  
+          image: asamaswini/ocean:v1
+          ports:
+            - containerPort: 8081  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ocean-service
+spec:
+  selector:
+    app: ocean-image  
+  ports:
+    - protocol: TCP
+      port: 80          
+      targetPort: 8081
+  type: LoadBalancer   
