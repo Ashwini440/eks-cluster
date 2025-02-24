@@ -13,7 +13,7 @@ spec:
         app: ocean
     spec:
       containers:
-        - name: ocean-v1
+        - name: ocean-v3
           image: asamaswini/ocean:v3
           ports:
             - containerPort: 8085
@@ -39,7 +39,7 @@ spec:
   selector:
     app: ocean  # Match the deployment label
   ports:
-    - name: ocean-v1
+    - name: ocean-v3
       port: 85          # External port for ocean-v1
       targetPort: 8085  # Matches ocean-v1 containerPort
     - name: ocean-v2
