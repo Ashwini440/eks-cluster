@@ -18,7 +18,7 @@ spec:
         - name: ocean-v3
           image: asamaswini/ocean:v3
           ports:
-            - containerPort: 8085
+            - containerPort: 8081
           
 
 
@@ -34,6 +34,6 @@ spec:
   ports:
     - name: ocean-v3
       port: 85          # External port for ocean-v1
-      targetPort: 8085  
+      targetPort: 8081 
       nodePort: 30070 # Matches ocean-v1 containerPort
   type: NodePort
