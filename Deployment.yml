@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: ocean-container
-          image: asamaswini/ocean:v11
+          image: asamaswini/ocean:v1
           ports:
             - containerPort: 8081
           readinessProbe:
@@ -38,7 +38,7 @@ metadata:
 spec:
   selector:
     app: ocean
-    version: v11 # Remove version-specific selector
+    version: v1 # Remove version-specific selector
   ports:
     - port: 80
       targetPort: 8081
