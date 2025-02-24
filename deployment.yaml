@@ -23,7 +23,7 @@ spec:
         - name: ocean-container
           image: asamaswini/ocean:v2
           ports:
-            - containerPort: 8082
+            - containerPort: 8081
           #readinessProbe:
           #  httpGet:
            #   path: /health
@@ -41,6 +41,6 @@ spec:
     version: v2
   ports:
     - port: 80
-      targetPort: 8082
+      targetPort: 8081
       nodePort: 30080
   type: NodePort
