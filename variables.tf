@@ -13,7 +13,7 @@ variable "region" {
 variable "cluster_name" {
   description = "The name of the Kubernetes cluster"
   type        = string
-  default     = "DC" 
+  default     = "jacksparrow" 
 }
 
 variable "node_count" {
