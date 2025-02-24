@@ -37,7 +37,8 @@ metadata:
   name: ocean-service
 spec:
   selector:
-    app: ocean  # Remove version-specific selector
+    app: ocean
+    version: v1# Remove version-specific selector
   ports:
     - port: 80
       targetPort: 8081
