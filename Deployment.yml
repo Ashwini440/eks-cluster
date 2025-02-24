@@ -14,7 +14,7 @@ spec:
     spec:
       containers:  
         - name: ocean  
-          image: asamaswini/ocean:v1
+          image: asamaswini/ocean:v2
           ports:
             - containerPort: 8081  
 ---
