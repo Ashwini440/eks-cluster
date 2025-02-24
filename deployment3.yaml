@@ -34,5 +34,6 @@ spec:
   ports:
     - name: ocean-v3
       port: 85          # External port for ocean-v1
-      targetPort: 8085  # Matches ocean-v1 containerPort
-  type: LoadBalancer
+      targetPort: 8085  
+      nodePort: 30070 # Matches ocean-v1 containerPort
+  type: NodePort
