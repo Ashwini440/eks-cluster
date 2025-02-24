@@ -17,11 +17,11 @@ spec:
     metadata:
       labels:
         app: ocean
-        version: v2
+        version: v3
     spec:
       containers:
         - name: ocean-container
-          image: asamaswini/ocean:v2
+          image: asamaswini/ocean:v3
           ports:
             - containerPort: 8081
           #readinessProbe:
@@ -38,7 +38,7 @@ metadata:
 spec:
   selector:
     app: ocean
-    version: v2
+    version: v3
   ports:
     - port: 80
       targetPort: 8081
