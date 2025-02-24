@@ -10,6 +10,6 @@ public class HelloController {
 
     @GetMapping
     public String sayHello() {
-        return "this is for automated rollback mechanisma incase deployment fails!";
+        return "hello cludbots of india!";
     }
 }
