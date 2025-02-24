@@ -22,7 +22,7 @@ spec:
               value: "8085"
 
         - name: ocean-v2
-          image: asamaswini/ocean:v2
+          image: asamaswini/ocean:v3
           ports:
             - containerPort: 8086
           env:
