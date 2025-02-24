@@ -16,24 +16,28 @@ spec:
         - name: ocean-v1
           image: asamaswini/ocean:v1
           ports:
-            - containerPort: 8081
+            - containerPort: 8085
 
         - name: ocean-v2
           image: asamaswini/ocean:v2
           ports:
-            - containerPort: 8082
+            - containerPort: 8086
 
----
+
 apiVersion: v1
 kind: Service
 metadata:
   name: ocean-nodeport
 spec:
   selector:
-    app: ocean
-    version: v2
+    app: ocean   # Removed version filter
   ports:
-    - port: 80
-      targetPort: 8081
-      nodePort: 30090
+    - name: ocean-v1
+      port: 85         # Exposed service port
+      targetPort: 8085 # Matches ocean-v1 containerPort
+      nodePort: 30090  # NodePort for ocean-v1
+    - name: ocean-v2
+      port: 86         # Exposed service port
+      targetPort: 8086 # Matches ocean-v2 containerPort
+      nodePort: 30091  # NodePort for ocean-v2
   type: NodePort
