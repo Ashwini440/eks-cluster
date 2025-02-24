@@ -7,16 +7,16 @@ spec:
   selector:
     matchLabels:
       app: ocean
-      version: v3
+      version: v4
   template:
     metadata:
       labels:
         app: ocean
-        version: v3
+        version: v4
     spec:
       containers:
         - name: ocean-v3
-          image: asamaswini/ocean:v3
+          image: asamaswini/ocean:v4
           ports:
             - containerPort: 8081
           
@@ -30,7 +30,7 @@ metadata:
 spec:
   selector:
     app: ocean
-    version: v3 # Match the deployment label
+    version: v4 # Match the deployment label
   ports:
     - name: ocean-v3
       port: 85          # External port for ocean-v1
