@@ -24,12 +24,12 @@ spec:
           image: asamaswini/ocean:v2
           ports:
             - containerPort: 8081
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 8081
-            initialDelaySeconds: 20
-            periodSeconds: 10
+          #readinessProbe:
+          #  httpGet:
+           #   path: /health
+            #  port: 8081
+            #initialDelaySeconds: 20
+            #periodSeconds: 10
 ---
 apiVersion: v1
 kind: Service
