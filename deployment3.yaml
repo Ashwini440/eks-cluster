@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ocean-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ocean
+  template:
+    metadata:
+      labels:
+        app: ocean
+    spec:
+      containers:
+        - name: ocean-v1
+          image: asamaswini/ocean:v1
+          ports:
+            - containerPort: 8081
+
+        - name: ocean-v2
+          image: asamaswini/ocean:v2
+          ports:
+            - containerPort: 8082
