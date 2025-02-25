@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-    M2_HOME = " /opt/apache-maven-3.9.9"
+    M2_HOME = " /opt/apache-maven-3.9.9/bin/"
     PATH    = "$PATH:$M2_HOME/bin"
     TF_VERSION = '1.10.5'
     TF_PATH = '/usr/bin/terraform'
