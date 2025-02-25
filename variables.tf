@@ -1,29 +1,13 @@
-variable "project_id" {
-  description = "The GCP project ID"
-  type        = string
-  default     = "aswini-447207"  
+variable "kubernetes_version" {
+  default     = 1.27
+  description = "kubernetes version"
 }
 
-variable "region" {
-  description = "The region where the resources will be created"
-  type        = string
-  default     = "us-west3-c"  // Change to a region with sufficient quota
+variable "vpc_cidr" {
+  default     = "10.0.0.0/16"
+  description = "default CIDR range of the VPC"
 }
-
-variable "cluster_name" {
-  description = "The name of the Kubernetes cluster"
-  type        = string
-  default     = "jacksparrow" 
-}
-
-variable "node_count" {
-  description = "The number of nodes in the Kubernetes cluster"
-  type        = number
-  default     = 1  
-}
-
-variable "node_machine_type" {
-  description = "The type of machine to use for nodes in the Kubernetes cluster"
-  type        = string
-  default     = "e2-medium"  // Adjust based on the required machine type
+variable "aws_region" {
+  default = "us-west-1"
+  description = "aws region"
 }
