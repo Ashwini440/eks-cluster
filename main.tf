@@ -1,173 +1,94 @@
-provider "aws" {
-    region = "us-east-1"
+# Get the default VPC
+data "aws_vpc" "default" {
+  default = var.aws_vpc
 }
 
-# VPC
-resource "aws_vpc" "eks_vpc" {
-  cidr_block           = "172.31.0.0/16"
-  enable_dns_support   = true
-  enable_dns_hostnames = true
-  tags = { 
-    Name = "eks-vpc" 
+# Get the default subnets
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
   }
-}
-
-# Subnets
-resource "aws_subnet" "public_subnet_1" {
-  vpc_id                  = aws_vpc.eks_vpc.id
-  cidr_block              = "172.31.1.0/24"
-  availability_zone       = "us-east-1a"
-  map_public_ip_on_launch = true
-  tags = { 
-    Name = "eks-public-subnet-1" 
-  }
-}
-
-resource "aws_subnet" "public_subnet_2" {
-  vpc_id                  = aws_vpc.eks_vpc.id
-  cidr_block              = "172.31.2.0/24"
-  availability_zone       = "us-east-1b"
-  map_public_ip_on_launch = true
-  tags = { 
-    Name = "eks-public-subnet-2" 
-  }
-}
-
-# Internet Gateway
-resource "aws_internet_gateway" "eks_igw" {
-  vpc_id = aws_vpc.eks_vpc.id
-  tags = { 
-    Name = "eks-igw" 
-  }
-}
-
-# Route Table
-resource "aws_route_table" "eks_route_table" {
-  vpc_id = aws_vpc.eks_vpc.id
-  tags = { 
-    Name = "eks-route-table" 
-  }
-}
-
-resource "aws_route" "eks_internet_route" {
-  route_table_id         = aws_route_table.eks_route_table.id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.eks_igw.id
-}
-
-# Associate Route Table with Subnets
-resource "aws_route_table_association" "public_subnet_assoc_1" {
-  subnet_id      = aws_subnet.public_subnet_1.id
-  route_table_id = aws_route_table.eks_route_table.id
-}
-
-resource "aws_route_table_association" "public_subnet_assoc_2" {
-  subnet_id      = aws_subnet.public_subnet_2.id
-  route_table_id = aws_route_table.eks_route_table.id
 }
 
 # IAM Role for EKS Cluster
 resource "aws_iam_role" "eks_cluster_role" {
-  name = "eks-cluster-role"
+  name = var.eks_cluster_role
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
     Statement = [{
-      Action    = "sts:AssumeRole"
-      Effect    = "Allow"
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
       Principal = { Service = "eks.amazonaws.com" }
     }]
+    Version = "2012-10-17"
   })
 }
 
-resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
+resource "aws_iam_role_policy_attachment" "eks_policy" {
   role       = aws_iam_role.eks_cluster_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  policy_arn = "arn:aws:iam::688567283917:policy/cluster-eks"
 }
 
-# Create EKS Cluster
-resource "aws_eks_cluster" "eks_cluster" {
-  name     = "my-eks-cluster"
+# Create the EKS Cluster
+resource "aws_eks_cluster" "eks" {
+  name     = var.eks_cluster_name
   role_arn = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {
-    subnet_ids = [
-      aws_subnet.public_subnet_1.id,
-      aws_subnet.public_subnet_2.id
-    ]
+    subnet_ids = data.aws_subnets.default.ids
   }
 
-  depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy]
+  depends_on = [aws_iam_role_policy_attachment.eks_policy]
 }
 
-# IAM Role for Node Group
+# IAM Role for EKS Nodes
 resource "aws_iam_role" "eks_node_role" {
-  name = "eks-node-role"
+  name = var.eks_node_role
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
     Statement = [{
-      Action    = "sts:AssumeRole"
-      Effect    = "Allow"
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
       Principal = { Service = "ec2.amazonaws.com" }
     }]
+    Version = "2012-10-17"
   })
 }
 
-resource "aws_iam_role_policy_attachment" "node_group_policy" {
+resource "aws_iam_role_policy_attachment" "worker_node" {
   role       = aws_iam_role.eks_node_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
 }
 
-# IAM Role Policy Attachments for Node Group
-resource "aws_iam_role_policy_attachment" "node_cni_policy" {
+resource "aws_iam_role_policy_attachment" "cni_policy" {
   role       = aws_iam_role.eks_node_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 }
 
-resource "aws_iam_role_policy_attachment" "node_ec2_container_policy" {
-  role       = aws_iam_role.eks_node_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-}
-
-resource "aws_iam_role_policy_attachment" "node_ssm_policy" {
-  role       = aws_iam_role.eks_node_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
-# Create Node Group
-resource "aws_eks_node_group" "node_group" {
-  cluster_name    = aws_eks_cluster.eks_cluster.name
-  node_group_name = "eks-node-group"
+# EKS Node Group
+resource "aws_eks_node_group" "eks_nodes" {
+  cluster_name    = aws_eks_cluster.eks.name
+  node_group_name = var.eks_nodegroup_name
   node_role_arn   = aws_iam_role.eks_node_role.arn
-  subnet_ids      = [
-    aws_subnet.public_subnet_1.id,
-    aws_subnet.public_subnet_2.id
-  ]
+  subnet_ids      = data.aws_subnets.default.ids
 
   scaling_config {
     desired_size = 2
-    max_size     = 3
     min_size     = 1
+    max_size     = 3
   }
 
-  instance_types = ["a1.medium"]
-  ami_type       = "AL2_ARM_64"
+  instance_types = ["t3.medium"]
+  ami_type       = "AL2_x86_64"
 
   depends_on = [
-    aws_eks_cluster.eks_cluster,
-    aws_iam_role_policy_attachment.node_group_policy,
-    aws_iam_role_policy_attachment.node_cni_policy,
-    aws_iam_role_policy_attachment.node_ec2_container_policy,
-    aws_iam_role_policy_attachment.node_ssm_policy
+    aws_iam_role_policy_attachment.worker_node,
+    aws_iam_role_policy_attachment.cni_policy
   ]
 }
 
-# Outputs
-output "eks_cluster_name" {
-  value = aws_eks_cluster.eks_cluster.name
-}
-
-output "eks_cluster_endpoint" {
-  value = aws_eks_cluster.eks_cluster.endpoint
+# Configure kubectl access
+output "kubeconfig_command" {
+  value = "aws eks update-kubeconfig --region us-east-1 --name ${aws_eks_cluster.eks.name}"
 }
