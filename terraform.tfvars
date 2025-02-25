@@ -1,4 +1,4 @@
-aws_region = "us-east-1b"
+aws_region = "us-west-2"
 aws_vpc = true
 eks_cluster_role = "cluster"
 eks_cluster_name = "marvel"
