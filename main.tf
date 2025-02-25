@@ -14,6 +14,11 @@ data "aws_subnets" "default" {
 # Get the default security group (Used for EKS communication)
 data "aws_security_group" "default" {
   filter {
+    name   = "cluster"
+    values = ["default"]  # The default security group name
+  }
+
+  filter {
     name   = "vpc-id"
     values = [data.aws_vpc.default.id]
   }
