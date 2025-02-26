@@ -16,7 +16,7 @@ spec:
     spec:
       containers:  # ✅ Fixed indentation
         - name: marvel-container2
-          image: 688567283917.dkr.ecr.us-east-1.amazonaws.com/marvel:v2
+          image: 688567283917.dkr.ecr.us-east-1.amazonaws.com/marvel:v2.1
           ports:
             - containerPort: 8081
           readinessProbe:
