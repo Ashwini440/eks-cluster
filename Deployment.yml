@@ -8,11 +8,11 @@ spec:
     matchLabels:
       app: marvel
       version: v1
- # strategy:
-  # type: RollingUpdate
-  #  rollingUpdate:
-   #   maxSurge: 1
-     # maxUnavailable: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -40,7 +40,7 @@ spec:
     app: marvel
     version: v1 
   ports:
-    - port: 80
-      targetPort: 8081
-      nodePort: 30090
-  type: NodePort
+    - port: 80          # Exposed port on LoadBalancer
+      targetPort: 8081  # The container port in the pod
+  type: LoadBalancer
+
