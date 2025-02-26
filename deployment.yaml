@@ -25,6 +25,8 @@ spec:
               port: 8081
             initialDelaySeconds: 60
             periodSeconds: 10
+    //spec:
+     // revisionHistoryLimit: 5  # ✅ Change this value as needed
 
  
 ---
