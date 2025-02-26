@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ocean-deployment
+  name: marvel-deployment3
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ocean
-      version: v4
+      app: marvel
+      version: v3
   template:
     metadata:
       labels:
-        app: ocean
-        version: v4
+        app: marvel
+        version: v3
     spec:
       containers:
-        - name: ocean-v3
-          image: asamaswini/ocean:v4
+        - name: marvel-container3
+          image: 688567283917.dkr.ecr.us-east-1.amazonaws.com/marvel:v3
           ports:
             - containerPort: 8081
           
@@ -26,14 +26,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ocean-loadbalancer
+  name: marvel-deploy3
 spec:
   selector:
-    app: ocean
-    version: v4 # Match the deployment label
+    app: marvel
+    version: v3
   ports:
-    - name: ocean-v3
-      port: 85          # External port for ocean-v1
+    - name: marvel-v3
+      port: 80         
       targetPort: 8081 
-      nodePort: 30070 # Matches ocean-v1 containerPort
+      nodePort: 30070 
   type: NodePort
