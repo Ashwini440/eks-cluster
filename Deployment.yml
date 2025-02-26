@@ -1,27 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ocean-v1
+  name: deploy-1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ocean
+      app: marvel
       version: v1
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
+ # strategy:
+  # type: RollingUpdate
+  #  rollingUpdate:
+   #   maxSurge: 1
+     # maxUnavailable: 1
   template:
     metadata:
       labels:
-        app: ocean
+        app: marvel
         version: v1
     spec:
       containers:
-        - name: ocean-container
-          image: asamaswini/ocean:v1
+        - name: marvel-container1
+          image: 688567283917.dkr.ecr.us-east-1.amazonaws.com/marvel:v1
           ports:
             - containerPort: 8081
           readinessProbe:
@@ -34,11 +34,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ocean-service
+  name: deploy1-service
 spec:
   selector:
-    app: ocean
-    version: v1 # Remove version-specific selector
+    app: marvel
+    version: v1 
   ports:
     - port: 80
       targetPort: 8081
