@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: deploy-v2-1
+  name: deploy-v2
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: marvel
-      version: v2.1
+      version: v2
   template:
     metadata:
       labels:
         app: marvel
-        version: v2.1
+        version: v2
     spec:
       containers:  # ✅ Fixed indentation
         - name: marvel-container2
