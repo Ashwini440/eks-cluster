@@ -32,8 +32,8 @@ spec:
     app: marvel
     version: v3
   ports:
-    - name: marvel-v3
-      port: 80         
-      targetPort: 8081 
-      nodePort: 30070 
-  type: NodePort
+    - name: http
+      port: 80          # External Port
+      targetPort: 8081  # Pod Port
+  type: LoadBalancer    # ✅ Changed to LoadBalancer
+
