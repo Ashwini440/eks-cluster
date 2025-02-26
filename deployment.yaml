@@ -37,7 +37,7 @@ metadata:
 spec:
   selector:
     app: marvel
-    version: v2.1
+    version: v2
   ports:
     - port: 80          # External Port
       targetPort: 8081  # Pod Port
