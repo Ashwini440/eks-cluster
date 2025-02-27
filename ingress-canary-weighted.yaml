@@ -3,8 +3,7 @@ kind: Ingress
 metadata:
   name: marvel-ingress
   annotations:
-    nginx.ingress.kubernetes.io/canary: "true"
-    nginx.ingress.kubernetes.io/canary-weight: "20"  # 20% traffic to v2
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
   rules:
@@ -18,6 +17,20 @@ spec:
                 name: deploy1-service
                 port:
                   number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: marvel-ingress-canary
+  annotations:
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-weight: "20"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: marvel.example.com
+      http:
+        paths:
           - path: /
             pathType: Prefix
             backend:
