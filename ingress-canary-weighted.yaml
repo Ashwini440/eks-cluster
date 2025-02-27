@@ -9,7 +9,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: marvel.example.com
+    - host: marvel.assy.com
       http:
         paths:
           - path: /
@@ -30,7 +30,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: marvel.example.com
+    - host: marvel.assy.com
       http:
         paths:
           - path: /
