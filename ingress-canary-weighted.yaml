@@ -6,6 +6,7 @@ metadata:
     nginx.ingress.kubernetes.io/canary: "true"
     nginx.ingress.kubernetes.io/canary-weight: "20"  # 20% traffic to v2
 spec:
+  ingressClassName: nginx
   rules:
     - host: marvel.example.com
       http:
