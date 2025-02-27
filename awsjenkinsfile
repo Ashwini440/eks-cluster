@@ -1,0 +1,99 @@
+pipeline {
+    agent any 
+    environment {
+        M2_HOME = "/opt/apache-maven-3.9.9"
+        PATH = "$M2_HOME/bin:$PATH"
+        CLUSTER_NAME = "marvel"
+        ECR_REPO = "688567283917.dkr.ecr.us-east-1.amazonaws.com/marvel"
+        TF_VERSION = '1.10.5'
+        TF_PATH = '/usr/bin/terraform'
+        KUBECONFIG_CONTENT = "/root/.kube/config"
+        AWS_REGION = "us-west-2"
+    }
+    stages {
+        stage('Git Checkout') {
+            steps {
+                git 'https://github.com/Ashwini440/eks-cluster.git' 
+            }
+        }
+        // stage('Build Artifact') {
+        //     steps {
+        //         sh 'mvn clean package'
+        //     }
+        // }
+        // stage('Docker Image Build') {
+        //     steps {
+        //         sh 'docker build -t marvel .'
+        //     }
+        // }
+        
+        // stage('Push Docker Image to ECR') {
+        //     steps {
+        //         withCredentials([aws(credentialsId: 'aws', region: 'us-east-1')]) {
+        //             sh '''
+        //                 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPO
+        //                 docker tag marvel:latest $ECR_REPO:v2.1
+        //                 docker push $ECR_REPO:v2.1
+        //             '''
+        //         }
+        //     }
+        // }
+        // stage('Cluster Provisioning with Terraform') {
+        //     steps {
+        //         withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        //             sh '$TF_PATH init'
+        //             sh '$TF_PATH plan'
+        //             sh '$TF_PATH apply --auto-approve'
+        //         }
+        //     }
+        // }
+        // stage('deleting infra') {
+        //     steps {
+        //         sh 'terraform destroy --auto-approve'
+        //     }
+        // }
+        stage('Configure Kubeconfig') {
+            steps {
+              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    sh 'aws eks update-kubeconfig --region us-west-2 --name marvel'
+                }
+            }
+        }
+        // stage('Configure Kubeconfig') {
+        //   steps {
+        //     withCredentials([file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG_CONTENT')]) {
+        //      sh '''
+        //         mkdir -p /tmp/kube
+        //         echo "$KUBECONFIG_CONTENT" > /tmp/kube/config
+        //         chmod 600 /tmp/kube/config
+        //         export KUBECONFIG_CONTENT=/tmp/kube/config
+        //         aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME 
+        //         '''
+        //     }
+        //   }
+        // }   
+    
+        stage('Deploy to EKS') {
+            steps {
+                withCredentials([aws(credentialsId: 'aws', region: 'us-west-2')]) {
+                sh 'kubectl apply -f Deployment.yml --validate=false'
+                
+                sh 'kubectl apply -f deployment2.yaml --validate=false'
+                
+                sh 'kubectl apply -f deployment3.yaml --validate=false'
+                sh 'kubectl apply -f deployment4.yaml --validate=false'
+                sh 'kubectl apply -f ingress-canary-weighted.yaml --validate=false'
+                }
+            }
+        }
+        // stage('Verify Deployment') {
+        //     steps {
+        //         withCredentials([aws(credentialsId: 'aws', region: 'us-west-2')]) {
+        //         sh 'kubectl get pods'
+        //         sh 'kubectl get svc'
+        //         sh 'kubectl get nodes -o wide'
+        //         }
+        //     }
+        // }
+    }
+}
