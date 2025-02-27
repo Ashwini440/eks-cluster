@@ -4,7 +4,7 @@ metadata:
   name: marvel-ingress
 spec:
   rules:
-    - host: marvel.example.com
+    - host: marvel.assy.com
       http:
         paths:
           - path: /v1
