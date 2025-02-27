@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: marvel-deployment3
+  name: deploy-v3
 spec:
   replicas: 1
   selector:
@@ -26,7 +26,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: marvel-deploy3
+  name: deploy3-service
 spec:
   selector:
     app: marvel
