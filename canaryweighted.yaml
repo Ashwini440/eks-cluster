@@ -10,14 +10,14 @@ spec:
     - host: marvel.example.com
       http:
         paths:
-          - path: /v1
+          - path: /
             pathType: Prefix
             backend:
               service:
                 name: deploy1-service
                 port:
                   number: 80
-          - path: /v2
+          - path: /
             pathType: Prefix
             backend:
               service:
