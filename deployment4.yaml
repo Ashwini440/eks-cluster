@@ -50,7 +50,7 @@ metadata:
 spec:
   selector:
     app: marvel
-    version: blue  # Initially pointing to Blue
+    version: green  # Initially pointing to Blue
   ports:
     - protocol: TCP
       port: 80
