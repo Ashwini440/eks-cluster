@@ -12,14 +12,14 @@ spec:
       http:
         paths:
           - path: /v1(/|$)(.*)  # This will capture sub-paths as well.
-            pathType: ImplementationSpecific  # Allows regex for path matching.
+            pathType: prefix
             backend:
               service:
                 name: deploy1-service
                 port:
                   number: 80
           - path: /v2(/|$)(.*)  # Similarly for v2.
-            pathType: ImplementationSpecific  # Allows regex for path matching.
+            pathType: prefix
             backend:
               service:
                 name: deploy2-service
