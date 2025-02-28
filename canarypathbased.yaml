@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: marvel-ingress
+  name: marvel-canary-path-ingress
 spec:
   rules:
     - host: marvel.assy.com
@@ -11,14 +11,14 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: marvel-v1-service
+                name: deploy1-service
                 port:
                   number: 80
           - path: /v2
             pathType: Prefix
             backend:
               service:
-                name: marvel-v2-service
+                name: deploy2-service
                 port:
                   number: 80
 
