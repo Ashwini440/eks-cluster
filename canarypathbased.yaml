@@ -10,6 +10,7 @@ spec:
     - host: marvel.assy.com
       http:
         paths:
+         # Path that routes all traffic starting with `/`
          - path: /
            pathType: Prefix
            backend:
@@ -17,19 +18,21 @@ spec:
                name: deploy1-service
                port:
                  number: 80
-          # Route all traffic that starts with /v1 to deploy1-service
-          - path: /v1
-            pathType: Prefix   # Match all subpaths under /v1
-            backend:
-              service:
-                name: deploy1-service
-                port:
-                  number: 80
-          # Route all traffic that starts with /v2 to deploy2-service
-          - path: /v2
-            pathType: Prefix   # Match all subpaths under /v2
-            backend:
-              service:
-                name: deploy2-service
-                port:
-                  number: 80
+         
+         # Path that routes all traffic starting with `/v1`
+         - path: /v1
+           pathType: Prefix   # Matches all subpaths under /v1
+           backend:
+             service:
+               name: deploy1-service
+               port:
+                 number: 80
+         
+         # Path that routes all traffic starting with `/v2`
+         - path: /v2
+           pathType: Prefix   # Matches all subpaths under /v2
+           backend:
+             service:
+               name: deploy2-service
+               port:
+                 number: 80
