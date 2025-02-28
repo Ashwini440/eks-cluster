@@ -4,22 +4,22 @@ metadata:
   name: marvel-canary-path-ingress
   annotations:
     kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    # Removed the rewrite target annotation to preserve the path.
 spec:
   ingressClassName: nginx
   rules:
     - host: marvel.assy.com
       http:
         paths:
-          - path: /v1
-            pathType: Prefix
+          - path: /v1(/|$)(.*)  # This will capture sub-paths as well.
+            pathType: ImplementationSpecific  # Allows regex for path matching.
             backend:
               service:
                 name: deploy1-service
                 port:
                   number: 80
-          - path: /v2
-            pathType: Prefix
+          - path: /v2(/|$)(.*)  # Similarly for v2.
+            pathType: ImplementationSpecific  # Allows regex for path matching.
             backend:
               service:
                 name: deploy2-service
