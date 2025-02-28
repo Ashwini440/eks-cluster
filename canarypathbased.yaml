@@ -17,7 +17,7 @@ spec:
               service:
                 name: deploy1-service
                 port:
-                  number: 80
+                  - number: 80
            - path: /v1
             pathType: Prefix
             backend:
@@ -31,5 +31,5 @@ spec:
               service:
                 name: deploy2-service
                 port:
-                  number: 80
+                  - number: 80
 
