@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: marvel-ingress
+  name: marvel-ingress-canary-weighted
   annotations:
     ingressclass.kubernetes.io/is-default-class: "true"
     ingress.kubernetes.io/disable-admission-webhook: "true"
@@ -23,7 +23,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: marvel-ingress-canary
+  name: marvel-ingress-canary-weighted
   annotations:
     nginx.ingress.kubernetes.io/canary: "true"
     nginx.ingress.kubernetes.io/canary-weight: "20"
