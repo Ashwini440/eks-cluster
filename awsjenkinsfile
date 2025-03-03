@@ -76,13 +76,15 @@ pipeline {
         stage('Deploy to EKS') {
             steps {
                 withCredentials([aws(credentialsId: 'aws', region: 'us-west-2')]) {
-                sh 'kubectl apply -f Deployment.yml --validate=false'
+                //sh 'kubectl apply -f Deployment.yml --validate=false'
                 
-                sh 'kubectl apply -f deployment2.yaml --validate=false'
+                //sh 'kubectl apply -f deployment2.yaml --validate=false'
                 
-                sh 'kubectl apply -f deployment3.yaml --validate=false'
-                sh 'kubectl apply -f deployment4.yaml --validate=false'
-                sh 'kubectl apply -f ingress-canary-weighted.yaml --validate=false'
+                //sh 'kubectl apply -f deployment3.yaml --validate=false'
+                //sh 'kubectl apply -f deployment4.yaml --validate=false'
+               // sh 'kubectl apply -f ingress-canary-weighted.yaml --validate=false'
+                sh 'kubectl apply -f canarypathbased.yaml --validate=false'
+                
                 }
             }
         }
