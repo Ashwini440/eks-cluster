@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: marvel-ingress
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "true"
+    ingress.kubernetes.io/disable-admission-webhook: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/canary: "true"  # Enable canary routing
+    nginx.ingress.kubernetes.io/canary-weight: "20"  # Route 20% to deploy2-service (v2)
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: marvel.assy.com
+      http:
+        paths:
+          - path: /v1
+            pathType: Prefix
+            backend:
+              service:
+                name: deploy1-service
+                port:
+                  number: 80
+          - path: /v2
+            pathType: Prefix
+            backend:
+              service:
+                name: deploy2-service
+                port:
+                  number: 80
