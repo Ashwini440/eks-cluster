@@ -9,6 +9,9 @@ pipeline {
         TF_PATH = '/usr/bin/terraform'
         KUBECONFIG_CONTENT = "/root/.kube/config"
         AWS_REGION = "us-west-2"
+        PROMETHEUS_REPO = "https://prometheus-community.github.io/helm-charts"
+        GRAFANA_REPO = "https://grafana.github.io/helm-charts"
+        NAMESPACE = "default"
     }
     stages {
         stage('Git Checkout') {
@@ -73,21 +76,43 @@ pipeline {
         //   }
         // }   
     
-        stage('Deploy to EKS') {
+        // stage('Deploy to EKS') {
+        //     steps {
+        //         withCredentials([aws(credentialsId: 'aws', region: 'us-west-2')]) {
+        //         sh 'kubectl apply -f Deployment.yml --validate=false'
+                
+        //         sh 'kubectl apply -f deployment2.yaml --validate=false'
+                
+        //         //sh 'kubectl apply -f deployment3.yaml --validate=false'
+        //         //sh 'kubectl apply -f deployment4.yaml --validate=false'
+        //       sh 'kubectl apply -f canary-weighted.yaml --validate=false'
+        //       // sh 'kubectl apply -f canarypathbased.yaml --validate=false'
+                
+        //         }
+        //     }
+        // }
+        stage('install helm') {
             steps {
-                withCredentials([aws(credentialsId: 'aws', region: 'us-west-2')]) {
-                //sh 'kubectl apply -f Deployment.yml --validate=false'
-                
-                //sh 'kubectl apply -f deployment2.yaml --validate=false'
-                
-                //sh 'kubectl apply -f deployment3.yaml --validate=false'
-                //sh 'kubectl apply -f deployment4.yaml --validate=false'
-               // sh 'kubectl apply -f ingress-canary-weighted.yaml --validate=false'
-                sh 'kubectl apply -f canarypathbased.yaml --validate=false'
-                
+                sh ''' 
+                  curl https://get.helm.sh/helm-v3.10.0-linux-amd64.tar.gz -o helm.tar.gz
+                 
+                  sudo -S tar -zxvf helm.tar.gz
+
+                  sudo mkdir -p /opt/helm
+                  sudo mv linux-amd64/helm /opt/helm/helm
+                  /opt/helm/helm version
+                '''
+            }
+        }
+        stage('adding prometheus-grafana repo') {
+            steps {
+                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                sh '''chmod +x helm.sh
+                      ./helm.sh'''
                 }
             }
         }
+
         // stage('Verify Deployment') {
         //     steps {
         //         withCredentials([aws(credentialsId: 'aws', region: 'us-west-2')]) {
@@ -99,3 +124,5 @@ pipeline {
         // }
     }
 }
+
+
