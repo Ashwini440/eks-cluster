@@ -1,5 +1,5 @@
 #!/bin/bash
-
+NAMESPACE="default"
 # Add Helm repositories for Prometheus and Grafana
 echo "Adding Prometheus Helm repo..."
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -36,11 +36,17 @@ kubectl get secret grafana -n default -o jsonpath="{.data.admin-password}" | bas
 
 # Edit the Prometheus service to set the type to LoadBalancer (if not already done)
 echo "Editing Prometheus service type to LoadBalancer..."
-kubectl edit svc prometheus-kube-prometheus-prometheus -n default
+kubectl patch svc prometheus-kube-prometheus-prometheus \
+  --namespace $NAMESPACE \
+  --type="json" \
+  -p '[{"op": "replace", "path": "/spec/type", "value": "LoadBalancer"}]'
 
 # Edit the Grafana service type to LoadBalancer (if not already done)
 echo "Editing Grafana service type to LoadBalancer..."
-kubectl edit svc prometheus-grafana -n default
+kubectl patch svc prometheus-grafana \
+  --namespace $NAMESPACE \
+  --type="json" \
+  -p '[{"op": "replace", "path": "/spec/type", "value": "LoadBalancer"}]'
 
 # Print the current services and their status
 echo "Final list of services in the default namespace..."
