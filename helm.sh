@@ -15,7 +15,7 @@ helm install prometheus prometheus-community/kube-prometheus-stack \
 
 # Wait for resources to be deployed
 echo "Waiting for deployments to complete..."
-kubectl get pods -n default --watch
+kubectl get pods -n default 
 
 # Check the list of installed Helm releases
 echo "Listing Helm releases..."
@@ -29,8 +29,6 @@ kubectl get all -n default
 echo "Checking Prometheus service..."
 kubectl get svc -n default
 
-echo "Checking Grafana service..."
-kubectl get svc -n default
 
 # Retrieve Grafana admin password from Kubernetes secrets
 echo "Retrieving Grafana admin password..."
