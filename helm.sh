@@ -4,6 +4,9 @@ NAMESPACE="default"
 echo "Adding Prometheus Helm repo..."
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
+echo "Adding Grafana Helm repo..."
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
 # Install Prometheus (Choose LoadBalancer or NodePort based on your preference)
 echo "Installing Prometheus..."
 helm install prometheus prometheus-community/kube-prometheus-stack \
@@ -12,7 +15,10 @@ helm install prometheus prometheus-community/kube-prometheus-stack \
   --set prometheus.server.service.type=LoadBalancer # Or use NodePort
 
 # Install Grafana (Choose LoadBalancer or NodePort based on your preference)
-
+echo "Installing Grafana..."
+helm install grafana grafana/grafana \
+  --namespace default \
+  --set service.type=LoadBalancer 
 # Wait for resources to be deployed
 echo "Waiting for deployments to complete..."
 kubectl get pods -n default 
