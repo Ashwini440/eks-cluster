@@ -92,5 +92,13 @@
             </plugin>
         </plugins>
     </build>
+    <!-- ✅ Nexus Repository Configuration -->
+    <distributionManagement>
+        <repository>
+            <id>assyvajrala-marvel</id>
+            <name>assyvajrala-marvel</name>
+            <url>https://assyvajrala-688567283917.d.codeartifact.us-east-1.amazonaws.com/maven/marvel/</url>
+        </repository>
+    </distributionManagement>
 
 </project>
