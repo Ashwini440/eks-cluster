@@ -6,6 +6,8 @@ metadata:
     ingressclass.kubernetes.io/is-default-class: "true"
     ingress.kubernetes.io/disable-admission-webhook: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /
+    prometheus.io/scrape: "true"  # Enable scraping for this service
+    prometheus.io/port: "9090" 
 spec:
   ingressClassName: nginx
   rules:
@@ -27,7 +29,10 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/canary: "true"
     nginx.ingress.kubernetes.io/canary-weight: "20"
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/rewrite-target: / annotations:
+    prometheus.io/scrape: "true"  # Enable scraping for this service
+    prometheus.io/port: "9090" 
+    
 spec:
   ingressClassName: nginx
   rules:
