@@ -29,11 +29,11 @@ RUN echo "AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}" && \
     echo "AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}"
 
 # Get the AWS CodeArtifact token for Maven and configure Maven settings
-RUN export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domain assyvajrala --domain-owner 688567283917 --region $AWS_REGION --query authorizationToken --output text) && \
+RUN export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domain assyvajrala --domain-owner 688567283917 --region us-east-1 --query authorizationToken --output text) && \
     echo "<settings><servers><server><id>aws</id><username>aws</username><password>${CODEARTIFACT_TOKEN}</password></server></servers></settings>" > /root/.m2/settings.xml
 
 # Fetch the artifact (JAR file) from AWS CodeArtifact and save it in the container
-RUN aws codeartifact get-package-version-asset --domain assyvajrala --repository marvel --package com.assy.com:cluster_jar --package-version 1.0-20250305.064417-1 --region us-east-1 --output json --query 'assets[0].url' | \
+RUN aws codeartifact get-package-version-asset --domain assyvajrala --repository marvel --package cluster_jar --package-version 1.0-20250305.064417-1 --region us-east-1 --output json --query 'assets[0].url' | \
     xargs -I {} curl -o /app/cluster_jar-1.0-20250305.064417-1.jar {}
 
 # Run the application (replace with your JAR file path)
