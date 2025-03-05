@@ -1,19 +1,28 @@
-# Use a base image (e.g., OpenJDK or any base image)
+# Use a base image (OpenJDK)
 FROM openjdk:11-jre-slim
+
+# Set working directory
 WORKDIR /app
-# Get the AWS CodeArtifact token for Maven (if using Maven)
-RUN export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domain assyvajrala --domain-owner 688567283917  --region us-east-1 --query authorizationToken --output text) && \
+
+# Install AWS CLI if not already installed
+RUN yum update && \
+    yum install -y \
+    curl \
+    unzip \
+    && curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+    && unzip awscliv2.zip \
+    && sudo ./aws/install \
+    && rm -rf awscliv2.zip ./aws
+
+# Get the AWS CodeArtifact token for Maven (optional, if needed)
+RUN export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domain assyvajrala --domain-owner 688567283917 --region us-east-1 --query authorizationToken --output text) && \
     echo "<settings><servers><server><id>aws</id><username>aws</username><password>${CODEARTIFACT_TOKEN}</password></server></servers></settings>" > /root/.m2/settings.xml
 
-# Alternatively, you can fetch the artifact manually (e.g., JAR file)
-RUN aws codeartifact get-package-version --domain assyvajrala --repository marvel --package com.assy.com:cluster_jar --package-version 1.0-20250305.064417-1 --region us-east-1 --output text
+# Fetch the artifact (JAR file) from AWS CodeArtifact and save it in the container
+RUN aws codeartifact get-package-version --domain assyvajrala --repository marvel --package com.assy.com:cluster_jar --package-version 1.0-20250305.064417-1 --region us-east-1 --output json --query 'packageVersion.asset'.value > /app/cluster_jar-1.0-20250305.064417-1.jar
 
-# Copy the artifact into your container
+# Optionally, copy other files (such as your application files) into the container
 COPY . .
 
-# Continue with the Dockerfile, for example, setting up the app or starting a service
-# RUN mvn clean install -DskipTests
-
-# Expose a port or set the command to run your app
-#CMD ["java", "-jar", "/app/your-artifact.jar"]
+# Run the application (replace with your JAR file path)
 CMD ["sh", "-c", "while true; do java -jar /app/cluster_jar-1.0-20250305.064417-1.jar; sleep 5; done"]
