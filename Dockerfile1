@@ -1,0 +1,26 @@
+# Use a base image (e.g., OpenJDK or any base image)
+FROM maven:3.6.3-jdk-11
+
+# Install AWS CLI
+RUN apt-get update && apt-get install -y awscli
+
+# Set AWS Credentials as environment variables
+ENV AWS_ACCESS_KEY_ID=<Your_Access_Key>
+ENV AWS_SECRET_ACCESS_KEY=<Your_Secret_Key>
+ENV AWS_DEFAULT_REGION=<Your_Region>
+
+# Get the AWS CodeArtifact token for Maven (if using Maven)
+RUN export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domain <your-domain> --domain-owner <your-account-id> --region <your-region> --query authorizationToken --output text) && \
+    echo "<settings><servers><server><id>aws</id><username>aws</username><password>${CODEARTIFACT_TOKEN}</password></server></servers></settings>" > /root/.m2/settings.xml
+
+# Alternatively, you can fetch the artifact manually (e.g., JAR file)
+RUN aws codeartifact get-package-version --domain <your-domain> --repository <your-repository> --package <your-package-name> --package-version <version> --region <your-region> --output json > /path/to/destination
+
+# Copy the artifact into your container
+COPY /path/to/destination /app/
+
+# Continue with the Dockerfile, for example, setting up the app or starting a service
+# RUN mvn clean install -DskipTests
+
+# Expose a port or set the command to run your app
+CMD ["java", "-jar", "/app/your-artifact.jar"]
