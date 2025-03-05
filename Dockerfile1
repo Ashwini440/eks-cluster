@@ -22,7 +22,7 @@ RUN export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domai
 RUN aws codeartifact get-package-version --domain assyvajrala --repository marvel --package com.assy.com:cluster_jar --package-version 1.0-20250305.064417-1 --region us-east-1 --output json --query 'packageVersion.asset'.value > /app/cluster_jar-1.0-20250305.064417-1.jar
 
 # Optionally, copy other files (such as your application files) into the container
-COPY cluster_jar-1.0-20250305.064417-1.jar /app/cluster_jar-1.0-20250305.064417-1.jar
+COPY . .
 
 # Run the application (replace with your JAR file path)
 CMD ["sh", "-c", "while true; do java -jar /app/cluster_jar-1.0-20250305.064417-1.jar; sleep 5; done"]
