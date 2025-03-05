@@ -35,6 +35,13 @@ RUN export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domai
 # Fetch the artifact (JAR file) from AWS CodeArtifact and save it in the container
 RUN aws codeartifact get-package-version-asset --domain assyvajrala --repository marvel --package cluster_jar --package-version 1.0-20250305.064417-1 --region us-east-1 --output json --query 'assets[0].url' | \
     xargs -I {} curl -o /app/cluster_jar-1.0-20250305.064417-1.jar {}
+# List contents of the /app directory to verify the file is downloaded
+RUN ls -l /app
+
+# Ensure the correct permissions for the JAR file
+RUN chmod +x /app/cluster_jar-1.0-20250305.064417-1.jar
+
+# Expose the port on which the application will run
 EXPOSE 8081
 
 # Run the application (replace with your JAR file path)
