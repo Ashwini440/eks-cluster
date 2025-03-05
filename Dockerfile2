@@ -1,3 +1,32 @@
+# Use OpenJDK base image
+FROM openjdk:11-jre-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install dependencies and AWS CLI (using AWS CLI v2)
+RUN apt-get update && \
+    apt-get install -y \
+    curl \
+    unzip && \
+    curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \
+    rm -rf awscliv2.zip
+
+# Set AWS region environment variable (you can change this if needed)
+ENV AWS_REGION us-west-2
+
+# Ensure the /root/.m2 directory exists for Maven settings file
+RUN mkdir -p /root/.m2
+
+# Set AWS credentials (using ARG to pass AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY)
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+
+# Debugging: print AWS credentials to check if they are passed correctly
+RUN echo "AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}" && \
+    echo "AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}"
 RUN export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domain assyvajrala --domain-owner 688567283917 --region us-west-2 --query authorizationToken --output text) && \
     echo "<settings><servers><server><id>aws</id><username>aws</username><password>${CODEARTIFACT_TOKEN}</password></server></servers></settings>" > /root/.m2/settings.xml && \
     # Fetch the artifact URL and print it for debugging
@@ -6,3 +35,4 @@ RUN export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domai
     xargs -I {} curl -o /app/cluster_jar-1.0-20250305.064417-1.jar {} && \
     # Ensure the correct permissions for the JAR file
     chmod +x /app/cluster_jar-1.0-20250305.064417-1.jar
+
