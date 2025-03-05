@@ -24,9 +24,9 @@ ENV AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 ENV AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
 
 # Configure AWS CLI with the provided credentials
-RUN aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && \
-    aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && \
-    aws configure set region $AWS_DEFAULT_REGION
+RUN aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID} && \
+    aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY} && \
+    aws configure set region ${AWS_DEFAULT_REGION}
 
 # Authenticate with AWS CodeArtifact to access the artifact
 RUN aws codeartifact login --tool maven --repository marvel --domain assyvajrala --region us-west-2
