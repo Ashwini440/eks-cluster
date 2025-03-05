@@ -33,16 +33,31 @@ RUN export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domai
     echo "<settings><servers><server><id>aws</id><username>aws</username><password>${CODEARTIFACT_TOKEN}</password></server></servers></settings>" > /root/.m2/settings.xml
 
 # Fetch the artifact (JAR file) from AWS CodeArtifact and save it in the container
-RUN aws codeartifact get-package-version-asset --domain assyvajrala --repository marvel --package cluster_jar --package-version 1.0-20250305.103220-1 --region us-west-2 --output json --query 'assets[0].url' | \
-    xargs -I {} curl -o /app/cluster_jar-1.0-20250305.064417-1.jar {}
+#RUN aws codeartifact get-package-version-asset --domain assyvajrala --repository marvel --package cluster_jar --package-version 1.0-20250305.103220-1 --region us-west-2 --output json --query 'assets[0].url' | \
+ #   xargs -I {} curl -o /app/cluster_jar-1.0-20250305.064417-1.jar {}
 # List contents of the /app directory to verify the file is downloaded
+RUN aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && \
+    aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && \
+    aws configure set region $AWS_DEFAULT_REGION
+
+# Authenticate with AWS CodeArtifact to access the artifact
+RUN aws codeartifact login --tool maven --repository marvel --domain assyvajrala --region us-west-2
+
+# Download the specific artifact (adjust the repository and version as needed)
+RUN mvn dependency:get -DrepoUrl=https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/ \
+    -Dartifact=com.assy.com:cluster_jar:1.0-20250305.103220-1
+
 RUN ls -l /app
 
 # Ensure the correct permissions for the JAR file
-RUN chmod +x /app/cluster_jar-1.0-20250305.064417-1.jar
+#RUN chmod +x /app/cluster_jar-1.0-20250305.064417-1.jar
 
 # Expose the port on which the application will run
 EXPOSE 8081
 
 # Run the application (replace with your JAR file path)
-CMD ["sh", "-c", "while true; do java -jar /app/cluster_jar-1.0-20250305.064417-1.jar; sleep 5; done"]
+#CMD ["sh", "-c", "while true; do java -jar /app/cluster_jar-1.0-20250305.064417-1.jar; sleep 5; done"]
+RUN cp ~/.m2/repository/com/assy/com/cluster_jar/1.0-20250305.103220-1/cluster_jar-1.0-20250305.103220-1.jar /app/cluster_jar.jar
+
+# Run the JAR file
+ENTRYPOINT ["java", "-jar", "cluster_jar.jar"]
