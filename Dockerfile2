@@ -3,12 +3,12 @@ FROM openjdk:11-jre-slim
 
 
 # Install necessary tools (AWS CLI, Java, and Maven)
-RUN yum update -y && \
-    yum install -y \
+RUN apt-get update -y && \
+    apt-get install -y \
     aws-cli \
     java-11-amazon-corretto \
     maven \
-    && yum clean all
+    && apt-get clean all
 
 # Set AWS environment variables for authentication (You can pass these at build time or set in CI/CD)
 ARG AWS_ACCESS_KEY_ID
