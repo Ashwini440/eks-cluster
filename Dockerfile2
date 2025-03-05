@@ -1,0 +1,8 @@
+RUN export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domain assyvajrala --domain-owner 688567283917 --region us-west-2 --query authorizationToken --output text) && \
+    echo "<settings><servers><server><id>aws</id><username>aws</username><password>${CODEARTIFACT_TOKEN}</password></server></servers></settings>" > /root/.m2/settings.xml && \
+    # Fetch the artifact URL and print it for debugging
+    aws codeartifact get-package-version-asset --domain assyvajrala --repository marvel --package cluster_jar --package-version 1.0-20250305.103220-1 --region us-west-2 --output json --query 'assets[0].url' && \
+    aws codeartifact get-package-version-asset --domain assyvajrala --repository marvel --package cluster_jar --package-version 1.0-20250305.103220-1 --region us-west-2 --output json --query 'assets[0].url' | \
+    xargs -I {} curl -o /app/cluster_jar-1.0-20250305.064417-1.jar {} && \
+    # Ensure the correct permissions for the JAR file
+    chmod +x /app/cluster_jar-1.0-20250305.064417-1.jar
