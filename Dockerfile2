@@ -7,10 +7,11 @@ RUN apt-get update && \
     apt-get install -y \
     curl \
     unzip && \
+    maven && \
     curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install && \
-     maven \
+    
     rm -rf awscliv2.zip
 # Set AWS environment variables for authentication (You can pass these at build time or set in CI/CD)
 ARG AWS_ACCESS_KEY_ID
