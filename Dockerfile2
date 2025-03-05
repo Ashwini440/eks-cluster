@@ -12,7 +12,7 @@ RUN apt-get update && \
 # Install AWS CLI v2
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
-    sudo ./aws/install && \
+    ./aws/install && \
     rm -rf awscliv2.zip
 
 # Set AWS environment variables for authentication (can be passed at build time or set in CI/CD)
