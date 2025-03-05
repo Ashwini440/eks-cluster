@@ -1,12 +1,12 @@
-# Use a base image (OpenJDK)
+# Use OpenJDK base image
 FROM openjdk:11-jre-slim
 
 # Set working directory
 WORKDIR /app
 
-# Install AWS CLI if not already installed
-RUN yum update && \
-    yum install -y \
+# Install AWS CLI using apt (Debian-based package manager)
+RUN apt-get update && \
+    apt-get install -y \
     curl \
     unzip \
     && curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
