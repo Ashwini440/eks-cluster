@@ -1,13 +1,16 @@
 # Use OpenJDK 11 slim image as the base
 FROM openjdk:11-jre-slim
 
-# Install dependencies, Maven, and AWS CLI (using AWS CLI v2)
+# Install dependencies and Maven
 RUN apt-get update && \
     apt-get install -y \
     curl \
     unzip \
     maven \
     && rm -rf /var/lib/apt/lists/*  # Clean up to reduce image size
+
+# Ensure Maven is correctly installed
+RUN mvn -v
 
 # Install AWS CLI v2
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
