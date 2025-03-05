@@ -1,62 +1,60 @@
-# Use OpenJDK base image
+# Use OpenJDK 11 slim image as the base
 FROM openjdk:11-jre-slim
 
-# Set working directory
-WORKDIR /app
-
-# Install dependencies and AWS CLI (using AWS CLI v2)
+# Install dependencies, Maven, and AWS CLI (using AWS CLI v2)
 RUN apt-get update && \
     apt-get install -y \
     curl \
-    unzip && \
-    curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip \
+    maven \
+    && rm -rf /var/lib/apt/lists/*  # Clean up to reduce image size
+
+# Ensure Maven is correctly installed
+RUN mvn -v
+
+# Install AWS CLI v2
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install && \
     rm -rf awscliv2.zip
 
-# Set AWS region environment variable (you can change this if needed)
-ENV AWS_REGION us-west-2
-
-# Ensure the /root/.m2 directory exists for Maven settings file
-RUN mkdir -p /root/.m2
-
-# Set AWS credentials (using ARG to pass AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY)
+# Set AWS environment variables for authentication (can be passed at build time or set in CI/CD)
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
+ARG AWS_DEFAULT_REGION
+ENV AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+ENV AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+ENV AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
 
-# Debugging: print AWS credentials to check if they are passed correctly
-RUN echo "AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}" && \
-    echo "AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}"
+# Configure AWS CLI with the provided credentials
+RUN aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID} && \
+    aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY} && \
+    aws configure set region ${AWS_DEFAULT_REGION}
 
-# Get the AWS CodeArtifact token for Maven and configure Maven settings
-RUN export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domain assyvajrala --domain-owner 688567283917 --region us-west-2 --query authorizationToken --output text) && \
-    echo "<settings><servers><server><id>aws</id><username>aws</username><password>${CODEARTIFACT_TOKEN}</password></server></servers></settings>" > /root/.m2/settings.xml
+# Authenticate to AWS CodeArtifact and get the authorization token
+RUN TOKEN=$(aws codeartifact get-authorization-token --domain assyvajrala --domain-owner 688567283917 --region us-west-2 --query authorizationToken --output text) && \
+    echo $TOKEN
 
-# Fetch the artifact (JAR file) from AWS CodeArtifact and save it in the container
-#RUN aws codeartifact get-package-version-asset --domain assyvajrala --repository marvel --package cluster_jar --package-version 1.0-20250305.103220-1 --region us-west-2 --output json --query 'assets[0].url' | \
- #   xargs -I {} curl -o /app/cluster_jar-1.0-20250305.064417-1.jar {}
-# List contents of the /app directory to verify the file is downloaded
-RUN aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && \
-    aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && \
-    aws configure set region $AWS_DEFAULT_REGION
+# Set the working directory in the container
+WORKDIR /app
 
-# Authenticate with AWS CodeArtifact to access the artifact
-RUN aws codeartifact login --tool maven --repository marvel --domain assyvajrala --region us-west-2
+# Copy the Maven settings file (this is important for the authentication to work)
+COPY settings.xml /root/.m2/settings.xml
 
-# Download the specific artifact (adjust the repository and version as needed)
+# Configure the Maven repository in the settings.xml file
+RUN echo "<servers> \
+    <server> \
+        <id>marvel</id> \
+        <username>AWS</username> \
+        <password>${TOKEN}</password> \
+    </server> \
+</servers>" > /root/.m2/settings.xml
+
+# Download the specific artifact from AWS CodeArtifact using Maven
 RUN mvn dependency:get -DrepoUrl=https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/ \
     -Dartifact=com.assy.com:cluster_jar:1.0-20250305.103220-1
 
-RUN ls -l /app
-
-# Ensure the correct permissions for the JAR file
-#RUN chmod +x /app/cluster_jar-1.0-20250305.064417-1.jar
-
-# Expose the port on which the application will run
-EXPOSE 8081
-
-# Run the application (replace with your JAR file path)
-#CMD ["sh", "-c", "while true; do java -jar /app/cluster_jar-1.0-20250305.064417-1.jar; sleep 5; done"]
+# Copy the JAR file from the Maven repository to the container
 RUN cp ~/.m2/repository/com/assy/com/cluster_jar/1.0-20250305.103220-1/cluster_jar-1.0-20250305.103220-1.jar /app/cluster_jar.jar
 
 # Run the JAR file
