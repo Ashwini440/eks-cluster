@@ -1,5 +1,6 @@
 # Use a base image with AWS CLI pre-installed
-FROM amazonlinux:2
+FROM openjdk:11-jre-slim
+
 
 # Install necessary tools (AWS CLI, Java, and Maven)
 RUN yum update -y && \
