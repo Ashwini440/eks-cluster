@@ -39,7 +39,7 @@ RUN TOKEN=$(aws codeartifact get-authorization-token --domain assyvajrala --doma
 WORKDIR /app
 
 # Copy the Maven settings file (this is important for the authentication to work)
-COPY settings.xml /root/.m2/settings.xml
+COPY settings.xml /var/lib/jenkins/.m2/settings.xml
 
 # Configure the Maven repository in the settings.xml file
 RUN echo "<servers> \
@@ -48,7 +48,7 @@ RUN echo "<servers> \
         <username>AWS</username> \
         <password>${TOKEN}</password> \
     </server> \
-</servers>" > /root/.m2/settings.xml
+</servers>" > /var/lib/jenkins/.m2/settings.xml
 
 # Download the specific artifact from AWS CodeArtifact using Maven
 RUN mvn dependency:get -DrepoUrl=https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/ \
