@@ -1,32 +1,39 @@
 # Use OpenJDK base image
 FROM openjdk:11-jre-slim
-# Set AWS credentials and region as environment variables
-ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-ENV AWS_DEFAULT_REGION=us-west-2
+
 # Set working directory
 WORKDIR /app
 
-# Install AWS CLI using apt (Debian-based package manager)
+# Install dependencies and AWS CLI (using AWS CLI v2)
 RUN apt-get update && \
     apt-get install -y \
     curl \
-    unzip \
-    && curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
-    && unzip awscliv2.zip \
-    && ./aws/install \
-    && rm -rf awscliv2.zip ./aws
-# Set AWS credentials manually
-RUN aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID} && \
-    aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY} && \
-    aws configure set region us-east-1
+    unzip && \
+    curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \
+    rm -rf awscliv2.zip
 
-# Get the AWS CodeArtifact token for Maven (optional, if needed)
-RUN export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domain assyvajrala --domain-owner 688567283917 --region us-east-1 --query authorizationToken --output text) && \
+# Set AWS region environment variable (you can change this if needed)
+ENV AWS_REGION us-east-1
+
+# Ensure the /root/.m2 directory exists for Maven settings file
+RUN mkdir -p /root/.m2
+
+# Set AWS credentials (using ARG to pass AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY)
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+
+# Debugging: print AWS credentials to check if they are passed correctly
+RUN echo "AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}" && \
+    echo "AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}"
+
+# Get the AWS CodeArtifact token for Maven and configure Maven settings
+RUN export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domain assyvajrala --domain-owner 688567283917 --region $AWS_REGION --query authorizationToken --output text) && \
     echo "<settings><servers><server><id>aws</id><username>aws</username><password>${CODEARTIFACT_TOKEN}</password></server></servers></settings>" > /root/.m2/settings.xml
 
 # Fetch the artifact (JAR file) from AWS CodeArtifact and save it in the container
-RUN aws codeartifact get-package-version --domain assyvajrala --repository marvel --package com.assy.com:cluster_jar --package-version 1.0-20250305.064417-1 --region us-east-1 --output json --query 'packageVersion.asset'.value > /app/cluster_jar-1.0-20250305.064417-1.jar
+RUN aws codeartifact get-package-version --domain assyvajrala --repository marvel --package com.assy.com:cluster_jar --package-version 1.0-20250305.064417-1 --region $AWS_REGION --output json --query 'packageVersion.asset'.value > /app/cluster_jar-1.0-20250305.064417-1.jar
 
 # Optionally, copy other files (such as your application files) into the container
 COPY . .
