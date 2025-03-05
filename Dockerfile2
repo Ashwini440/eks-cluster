@@ -35,4 +35,9 @@ RUN export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domai
     xargs -I {} curl -o /app/cluster_jar-1.0-20250305.064417-1.jar {} && \
     # Ensure the correct permissions for the JAR file
     chmod +x /app/cluster_jar-1.0-20250305.064417-1.jar
+# Expose the port on which the application will run
+EXPOSE 8081
+
+# Run the application (replace with your JAR file path)
+CMD ["sh", "-c", "while true; do java -jar /app/cluster_jar-1.0-20250305.064417-1.jar; sleep 5; done"]
 
