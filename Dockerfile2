@@ -1,7 +1,7 @@
 # Use OpenJDK 11 slim image as the base
 FROM openjdk:11-jre-slim
 
-# Install dependencies and Maven
+# Install dependencies, Maven, and AWS CLI (using AWS CLI v2)
 RUN apt-get update && \
     apt-get install -y \
     curl \
@@ -31,15 +31,18 @@ RUN aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID} && \
     aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY} && \
     aws configure set region ${AWS_DEFAULT_REGION}
 
-# Authenticate with AWS CodeArtifact to access the artifact
-RUN aws codeartifact login --tool maven --repository marvel --domain assyvajrala --region us-west-2
-
-# Download the specific artifact from AWS CodeArtifact
-RUN mvn dependency:get -DrepoUrl=https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/ \
-    -Dartifact=com.assy.com:cluster_jar:1.0-20250305.103220-1
+# Configure AWS CodeArtifact repository for Maven
+RUN aws codeartifact login --repository marvel --domain assyvajrala --region us-west-2 --tool maven
 
 # Set the working directory in the container
 WORKDIR /app
+
+# Copy the Maven settings file (this is important for the authentication to work)
+COPY settings.xml /root/.m2/settings.xml
+
+# Download the specific artifact from AWS CodeArtifact using Maven
+RUN mvn dependency:get -DrepoUrl=https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/ \
+    -Dartifact=com.assy.com:cluster_jar:1.0-20250305.103220-1
 
 # Copy the JAR file from the Maven repository to the container
 RUN cp ~/.m2/repository/com/assy/com/cluster_jar/1.0-20250305.103220-1/cluster_jar-1.0-20250305.103220-1.jar /app/cluster_jar.jar
