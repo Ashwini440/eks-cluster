@@ -38,7 +38,7 @@ RUN aws codeartifact login --repository marvel --domain assyvajrala --region us-
 WORKDIR /app
 
 # Copy the Maven settings file (this is important for the authentication to work)
-COPY settings.xml /root/.m2/settings.xml
+#COPY settings.xml /root/.m2/settings.xml
 
 # Download the specific artifact from AWS CodeArtifact using Maven
 RUN mvn dependency:get -DrepoUrl=https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/ \
