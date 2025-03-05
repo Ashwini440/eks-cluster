@@ -12,49 +12,81 @@ pipeline {
         PROMETHEUS_REPO = "https://prometheus-community.github.io/helm-charts"
         GRAFANA_REPO = "https://grafana.github.io/helm-charts"
         NAMESPACE = "default"
+        ARTIFACT_REGION = 'us-east-1'  // Change this to your region
+        CODEARTIFACT_DOMAIN = 'assyvajrala'  // Your CodeArtifact domain name
+        CODEARTIFACT_REPO = 'marvel' 
     }
     stages {
         stage('Git Checkout') {
             steps {
-                git 'https://github.com/Ashwini440/eks-cluster.git' 
+                git 'https://github.com/Ashwini440/eks-cluster.git'
             }
         }
-        // stage('Build Artifact') {
-        //     steps {
-        //         sh 'mvn clean package'
-        //     }
-        // }
-        // stage('Docker Image Build') {
-        //     steps {
-        //         sh 'docker build -t marvel .'
-        //     }
-        // }
         
-        // stage('Push Docker Image to ECR') {
-        //     steps {
-        //         withCredentials([aws(credentialsId: 'aws', region: 'us-east-1')]) {
-        //             sh '''
-        //                 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPO
-        //                 docker tag marvel:latest $ECR_REPO:v2.1
-        //                 docker push $ECR_REPO:v2.1
-        //             '''
-        //         }
-        //     }
-        // }
-        // stage('Cluster Provisioning with Terraform') {
-        //     steps {
-        //         withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-        //             sh '$TF_PATH init'
-        //             sh '$TF_PATH plan'
-        //             sh '$TF_PATH apply --auto-approve'
-        //         }
-        //     }
-        // }
-        // stage('deleting infra') {
-        //     steps {
-        //         sh 'terraform destroy --auto-approve'
-        //     }
-        // }
+        stage('Build Artifact') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        
+        stage('Connecting to AWS CodeArtifact Repo') {
+            steps {
+                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    script {
+                def authToken = sh(script: """
+                    aws codeartifact get-authorization-token --domain $CODEARTIFACT_DOMAIN --domain-owner 688567283917 --region $ARTIFACT_REGION --query authorizationToken --output text
+                """, returnStdout: true).trim()
+
+                echo "Auth Token: ${authToken}"  // Debugging token value
+
+                // Ensure the Maven settings file is written to the correct directory
+                def mavenSettingsPath = "${env.HOME}/.m2/settings.xml"  // Adjust if $HOME is not correct
+                echo "Maven Settings Path: ${mavenSettingsPath}"
+
+                // Create the directory and write the settings file
+                sh """
+                    mkdir -p \$(dirname ${mavenSettingsPath}) && echo '<settings><servers><server><id>assyvajrala-marvel</id><username>aws</username><password>${authToken}</password></server></servers></settings>' > ${mavenSettingsPath}
+                """
+              }
+            }
+          }
+        }
+        stage('Build and Deploy') {
+            steps {
+            sh 'mvn clean deploy -DskipTests'
+            }
+        }
+        stage('Docker Image Build') {
+            steps {
+                sh 'docker build -t marvel .'
+            }
+        }
+        
+        stage('Push Docker Image to ECR') {
+            steps {
+                withCredentials([aws(credentialsId: 'aws', region: 'us-east-1')]) {
+                    sh '''
+                        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPO
+                        docker tag marvel:latest $ECR_REPO:v2.1
+                        docker push $ECR_REPO:v2.1
+                    '''
+                }
+            }
+        }
+        stage('Cluster Provisioning with Terraform') {
+            steps {
+                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    sh '$TF_PATH init'
+                    sh '$TF_PATH plan'
+                    sh '$TF_PATH apply --auto-approve'
+                }
+            }
+        }
+        stage('deleting infra') {
+            steps {
+                sh 'terraform destroy --auto-approve'
+            }
+        }
         stage('Configure Kubeconfig') {
             steps {
               withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
@@ -62,35 +94,35 @@ pipeline {
                 }
             }
         }
-        // stage('Configure Kubeconfig') {
-        //   steps {
-        //     withCredentials([file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG_CONTENT')]) {
-        //      sh '''
-        //         mkdir -p /tmp/kube
-        //         echo "$KUBECONFIG_CONTENT" > /tmp/kube/config
-        //         chmod 600 /tmp/kube/config
-        //         export KUBECONFIG_CONTENT=/tmp/kube/config
-        //         aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME 
-        //         '''
-        //     }
-        //   }
-        // }   
+        stage('Configure Kubeconfig') {
+          steps {
+            withCredentials([file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG_CONTENT')]) {
+             sh '''
+                mkdir -p /tmp/kube
+                echo "$KUBECONFIG_CONTENT" > /tmp/kube/config
+                chmod 600 /tmp/kube/config
+                export KUBECONFIG_CONTENT=/tmp/kube/config
+                aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME 
+                '''
+            }
+          }
+        }   
     
-        // stage('Deploy to EKS') {
-        //     steps {
-        //         withCredentials([aws(credentialsId: 'aws', region: 'us-west-2')]) {
-        //         sh 'kubectl apply -f Deployment.yml --validate=false'
+        stage('Deploy to EKS') {
+            steps {
+                withCredentials([aws(credentialsId: 'aws', region: 'us-west-2')]) {
+                sh 'kubectl apply -f Deployment.yml --validate=false'
                 
-        //         sh 'kubectl apply -f deployment2.yaml --validate=false'
+                sh 'kubectl apply -f deployment2.yaml --validate=false'
                 
-        //         //sh 'kubectl apply -f deployment3.yaml --validate=false'
-        //         //sh 'kubectl apply -f deployment4.yaml --validate=false'
-        //       sh 'kubectl apply -f canary-weighted.yaml --validate=false'
-        //       // sh 'kubectl apply -f canarypathbased.yaml --validate=false'
+                //sh 'kubectl apply -f deployment3.yaml --validate=false'
+                //sh 'kubectl apply -f deployment4.yaml --validate=false'
+              sh 'kubectl apply -f canary-weighted.yaml --validate=false'
+              // sh 'kubectl apply -f canarypathbased.yaml --validate=false'
                 
-        //         }
-        //     }
-        // }
+                }
+            }
+        }
         stage('install helm') {
             steps {
                 sh ''' 
@@ -113,15 +145,15 @@ pipeline {
             }
         }
 
-        // stage('Verify Deployment') {
-        //     steps {
-        //         withCredentials([aws(credentialsId: 'aws', region: 'us-west-2')]) {
-        //         sh 'kubectl get pods'
-        //         sh 'kubectl get svc'
-        //         sh 'kubectl get nodes -o wide'
-        //         }
-        //     }
-        // }
+        stage('Verify Deployment') {
+            steps {
+                withCredentials([aws(credentialsId: 'aws', region: 'us-west-2')]) {
+                sh 'kubectl get pods'
+                sh 'kubectl get svc'
+                sh 'kubectl get nodes -o wide'
+                }
+            }
+        }
     }
 }
 
