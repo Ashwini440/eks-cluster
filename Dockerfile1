@@ -28,11 +28,6 @@ RUN aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID} && \
     aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY} && \
     aws configure set region ${AWS_DEFAULT_REGION}
 
-# Set environment variables for AWS credentials and CodeArtifact configuration
-ENV AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
-ENV CODEARTIFACT_DOMAIN=assyvajrala
-ENV CODEARTIFACT_DOMAIN_OWNER=688567283917
-ENV CODEARTIFACT_REPOSITORY=marvel
 
 
 # Set environment variables for AWS credentials and CodeArtifact configuration
@@ -72,7 +67,7 @@ RUN mkdir -p /root/.m2 && \
     echo "  </profiles>" >> /root/.m2/settings.xml && \
     echo "</settings>" >> /root/.m2/settings.xml
 
-
+RUN aws codeartifact download-package-version --domain $CODEARTIFACT_DOMAIN --domain-owner $CODEARTIFACT_DOMAIN_OWNER --repository $CODEARTIFACT_REPOSITORY --package cluster_jar --package-version 1.0-20250305.103220-1 --region $AWS_DEFAULT_REGION --output-dir /app/
 
 #WORKDIR /var/lib/jenkins/workspaces/eks/
 # Run Maven to build the project or fetch artifacts
@@ -81,19 +76,19 @@ RUN mkdir -p /root/.m2 && \
 #EXPOSE 8080
 #CMD ["mvn", "clean", "install"]
 #ENTRYPOINT ["java", "-jar", "/app/cluster_jar.jar"]
-WORKDIR /var/lib/jenkins/workspaces/eks/
+#WORKDIR /var/lib/jenkins/workspaces/eks/
 
 # Run Maven to build the project or fetch artifacts
-RUN mvn clean install
+#RUN mvn clean install
 
 # Now copy the built JAR file from the target/ directory
-COPY target/cluster_jar.jar /app/cluster_jar.jar
+#COPY target/cluster_jar.jar /app/cluster_jar.jar
 
 # Set working directory inside container
 WORKDIR /app
 
 # Expose the port your application will run on
-EXPOSE 8080
+EXPOSE 8081
 
 # Run the JAR file when the container starts
 ENTRYPOINT ["java", "-jar", "/app/cluster_jar.jar"]
