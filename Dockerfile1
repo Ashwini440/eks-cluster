@@ -1,85 +1,48 @@
-# Use OpenJDK 11 slim image as the base
-FROM openjdk:11-jre-slim
+FROM openjdk:11-jdk
 
-# Install dependencies, Maven, and AWS CLI (using AWS CLI v2)
-RUN apt-get update && \
-    apt-get install -y \
-    curl \
-    unzip \
-    maven \
-    && rm -rf /var/lib/apt/lists/*  # Clean up to reduce image size
+# Install AWS CLI
+RUN apt-get update && apt-get install -y \
+    awscli \
+    maven
 
-# Ensure Maven is correctly installed
-RUN mvn -v
+# Set up the environment variable for AWS credentials
+ENV AWS_ACCESS_KEY_ID=your-access-key-id
+ENV AWS_SECRET_ACCESS_KEY=your-secret-access-key
+ENV AWS_DEFAULT_REGION=us-west-2
 
-# Install AWS CLI v2
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
-    unzip awscliv2.zip && \
-    ./aws/install && \
-    rm -rf awscliv2.zip
+# Set up any other environment variables needed for your application
+# For example, environment variables for authentication token and domain
+ENV CODEARTIFACT_DOMAIN=assyvajrala
+ENV CODEARTIFACT_DOMAIN_OWNER=688567283917
+ENV CODEARTIFACT_REPOSITORY=marvel# Get the authorization token during the build (or as part of your entrypoint)
+RUN export CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain $CODEARTIFACT_DOMAIN --domain-owner $CODEARTIFACT_DOMAIN_OWNER --region $AWS_DEFAULT_REGION --query authorizationToken --output text)
 
-# Set AWS environment variables for authentication (can be passed at build time or set in CI/CD)
-ARG AWS_ACCESS_KEY_ID
-ARG AWS_SECRET_ACCESS_KEY
-ARG AWS_DEFAULT_REGION
-ENV AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-ENV AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-ENV AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
+# Configure Maven settings to include the CodeArtifact authentication token
+RUN mkdir -p /root/.m2 && \
+    echo "<servers>" > /root/.m2/settings.xml && \
+    echo "  <server>" >> /root/.m2/settings.xml && \
+    echo "    <id>assyvajrala-marvel</id>" >> /root/.m2/settings.xml && \
+    echo "    <username>aws</username>" >> /root/.m2/settings.xml && \
+    echo "    <password>${env.CODEARTIFACT_AUTH_TOKEN}</password>" >> /root/.m2/settings.xml && \
+    echo "  </server>" >> /root/.m2/settings.xml && \
+    echo "</servers>" >> /root/.m2/settings.xml && \
+    echo "<profiles>" >> /root/.m2/settings.xml && \
+    echo "  <profile>" >> /root/.m2/settings.xml && \
+    echo "    <id>assyvajrala-marvel</id>" >> /root/.m2/settings.xml && \
+    echo "    <activation>" >> /root/.m2/settings.xml && \
+    echo "      <activeByDefault>true</activeByDefault>" >> /root/.m2/settings.xml && \
+    echo "    </activation>" >> /root/.m2/settings.xml && \
+    echo "    <repositories>" >> /root/.m2/settings.xml && \
+    echo "      <repository>" >> /root/.m2/settings.xml && \
+    echo "        <id>assyvajrala-marvel</id>" >> /root/.m2/settings.xml && \
+    echo "        <url>https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/</url>" >> /root/.m2/settings.xml && \
+    echo "      </repository>" >> /root/.m2/settings.xml && \
+    echo "    </repositories>" >> /root/.m2/settings.xml && \
+    echo "  </profile>" >> /root/.m2/settings.xml && \
+    echo "</profiles>" >> /root/.m2/settings.xml
 
-# Configure AWS CLI with the provided credentials
-RUN aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID} && \
-    aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY} && \
-    aws configure set region ${AWS_DEFAULT_REGION}
+# Run Maven to build the project or fetch artifacts
+RUN mvn clean install
+EXPOSE 8080
+CMD ["mvn", "clean", "install"]
 
-# Authenticate to AWS CodeArtifact and get the authorization token
-RUN TOKEN=$(aws codeartifact get-authorization-token --domain assyvajrala --domain-owner 688567283917 --region us-west-2 --query authorizationToken --output text) && \
-    echo "AWS CodeArtifact Token: $TOKEN"  # Debugging token value
-
-# Set the working directory in the container
-WORKDIR /app
-
-# Create Maven settings directory for user (ensure the directory exists)
-ENV MAVEN_USER_HOME=/app/.m2
-RUN mkdir -p /app/.m2
-COPY settings.xml /app/.m2/settings.xml
-RUN ls -alh .
-
-# Copy the Maven settings file dynamically or use an inline echo to configure it
-RUN echo "<settings>\
-    <servers>\
-        <server>\
-            <id>assyvajrala-marvel</id>\
-            <username>aws</username>\
-            <password>${TOKEN}</password>\
-        </server>\
-    </servers>\
-    <profiles>\
-        <profile>\
-            <id>assyvajrala-marvel</id>\
-            <activation>\
-                <activeByDefault>true</activeByDefault>\
-            </activation>\
-            <repositories>\
-                <repository>\
-                    <id>assyvajrala-marvel</id>\
-                    <url>https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/</url>\
-                </repository>\
-            </repositories>\
-        </profile>\
-    </profiles>\
-</settings>" > /app/.m2/settings.xml
-
-
-
-# Verify that the settings.xml file was correctly created and contains the authentication token
-RUN cat /app/.m2/settings.xml  # Debugging step to ensure the settings.xml is correctly written
-
-# Download the specific artifact from AWS CodeArtifact using Maven
-RUN mvn dependency:get -DrepoUrl=https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/ \
-    -Dartifact=com.assy.com:cluster_jar:1.0-20250305.103220-1
-
-# Copy the JAR file from the Maven repository to the container
-RUN cp /app/.m2/repository/com/assy/com/cluster_jar/1.0-20250305.103220-1/cluster_jar-1.0-20250305.103220-1.jar /app/cluster_jar.jar
-
-# Run the JAR file
-ENTRYPOINT ["java", "-jar", "/app/cluster_jar.jar"]
