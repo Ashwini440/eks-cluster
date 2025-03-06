@@ -78,7 +78,7 @@ RUN aws codeartifact get-package-version-asset \
   --region us-west-2 \
   --asset cluster_jar-1.0-20250305.103220-1.jar \
   --format json \
-  --outfile /app/cluster_jar-1.0-20250305.103220-1.jar
+ > /app/cluster_jar-1.0-20250305.103220-1.jar
 
 
 
