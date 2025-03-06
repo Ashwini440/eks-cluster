@@ -10,12 +10,16 @@ ENV AWS_ACCESS_KEY_ID=your-access-key-id
 ENV AWS_SECRET_ACCESS_KEY=your-secret-access-key
 ENV AWS_DEFAULT_REGION=us-west-2
 
-# Set up any other environment variables needed for your application
-# For example, environment variables for authentication token and domain
+# Set environment variables for AWS credentials and CodeArtifact configuration
 ENV CODEARTIFACT_DOMAIN=assyvajrala
 ENV CODEARTIFACT_DOMAIN_OWNER=688567283917
-ENV CODEARTIFACT_REPOSITORY=marvel# Get the authorization token during the build (or as part of your entrypoint)
-RUN export CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain $CODEARTIFACT_DOMAIN --domain-owner $CODEARTIFACT_DOMAIN_OWNER --region $AWS_DEFAULT_REGION --query authorizationToken --output text)
+ENV CODEARTIFACT_REPOSITORY=marvel
+ENV AWS_DEFAULT_REGION=us-west-2
+
+# Fetch the authorization token and store it in a Docker environment variable
+RUN CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain $CODEARTIFACT_DOMAIN --domain-owner $CODEARTIFACT_DOMAIN_OWNER --region $AWS_DEFAULT_REGION --query authorizationToken --output text) && \
+    echo "CODEARTIFACT_AUTH_TOKEN=$CODEARTIFACT_AUTH_TOKEN"
+
 
 # Configure Maven settings to include the CodeArtifact authentication token
 RUN mkdir -p /root/.m2 && \
