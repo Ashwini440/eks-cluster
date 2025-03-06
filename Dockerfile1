@@ -74,11 +74,24 @@ RUN mkdir -p /root/.m2 && \
 
 
 
-WORKDIR /var/lib/jenkins/workspaces/eks/
+#WORKDIR /var/lib/jenkins/workspaces/eks/
 # Run Maven to build the project or fetch artifacts
 #RUN mvn clean install
-WORKDIR /app
-EXPOSE 8080
+#WORKDIR /app
+#EXPOSE 8080
 #CMD ["mvn", "clean", "install"]
-ENTRYPOINT ["java", "-jar", "/app/cluster_jar.jar"]
+#ENTRYPOINT ["java", "-jar", "/app/cluster_jar.jar"]
+WORKDIR /app
 
+# Fetch the artifact from CodeArtifact and install it (ensure it's available in the local repository)
+RUN mvn dependency:go-offline
+
+# Expose the port your application will run on
+EXPOSE 8081
+
+# Add the JAR file (ensure it is in the correct location)
+# Assuming Maven has placed the JAR in the target directory
+COPY target/cluster_jar.jar /app/cluster_jar.jar
+
+# Run the JAR file when the container starts
+ENTRYPOINT ["java", "-jar", "/app/cluster_jar.jar"]
