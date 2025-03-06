@@ -85,5 +85,9 @@ RUN aws codeartifact get-package-version-asset \
 RUN ls -l /app/
 
 RUN chmod +rx /app/cluster_jar-1.0-20250305.105648-2.jar
+RUN chown root:root /app/cluster_jar-1.0-20250305.105648-2.jar
+RUN cp /app/cluster_jar-1.0-20250305.105648-2.jar /app/cluster_jar.jar
+
+
 EXPOSE 8084
-CMD ["sh", "-c", "while true; do java -jar /app/cluster_jar-1.0-20250305.105648-2.jar; sleep 5; done"]
+CMD ["sh", "-c", "while true; do java -jar /app/cluster_jar.jar; sleep 5; done"]
