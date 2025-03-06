@@ -39,7 +39,7 @@ RUN TOKEN=$(aws codeartifact get-authorization-token --domain assyvajrala --doma
 WORKDIR /app
 
 # Create Maven settings directory for user (ensure the directory exists)
-RUN mkdir -p /root/.m2
+RUN mkdir -p /var/lib/jenkins/.m2
 
 # Copy the Maven settings file dynamically or use an inline echo to configure it
 RUN echo "<settings>\
@@ -64,14 +64,17 @@ RUN echo "<settings>\
             </repositories>\
         </profile>\
     </profiles>\
-</settings>" > /root/.m2/settings.xml
+</settings>" > /var/lib/jenkins/.m2/settings.xml
+
+# Verify that the settings.xml file was correctly created and contains the authentication token
+RUN cat /var/lib/jenkins/.m2/settings.xml  # Debugging step to ensure the settings.xml is correctly written
 
 # Download the specific artifact from AWS CodeArtifact using Maven
 RUN mvn dependency:get -DrepoUrl=https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/ \
     -Dartifact=com.assy.com:cluster_jar:1.0-20250305.103220-1
 
 # Copy the JAR file from the Maven repository to the container
-RUN cp /root/.m2/repository/com/assy/com/cluster_jar/1.0-20250305.103220-1/cluster_jar-1.0-20250305.103220-1.jar /app/cluster_jar.jar
+RUN cp /var/lib/jenkins/.m2/repository/com/assy/com/cluster_jar/1.0-20250305.103220-1/cluster_jar-1.0-20250305.103220-1.jar /app/cluster_jar.jar
 
 # Run the JAR file
 ENTRYPOINT ["java", "-jar", "/app/cluster_jar.jar"]
