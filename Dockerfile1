@@ -86,4 +86,5 @@ RUN aws codeartifact get-package-version-asset \
 EXPOSE 8081
 
 # Run the JAR file when the container starts
-ENTRYPOINT ["java", "-jar", "/app/cluster_jar-1.0-20250305.103220-1.jar"]
+#ENTRYPOINT ["java", "-jar", "/app/cluster_jar-1.0-20250305.103220-1.jar"]
+ENTRYPOINT ["sh", "-c", "java -jar /app/cluster_jar-1.0-20250305.103220-1.jar && tail -f /dev/null"]
