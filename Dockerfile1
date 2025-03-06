@@ -48,27 +48,30 @@ RUN CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain 
 
 # Configure Maven settings to include the CodeArtifact authentication token
 RUN mkdir -p /root/.m2 && \
-    echo "<servers>" > /root/.m2/settings.xml && \
-    echo "  <server>" >> /root/.m2/settings.xml && \
-    echo "    <id>assyvajrala-marvel</id>" >> /root/.m2/settings.xml && \
-    echo "    <username>aws</username>" >> /root/.m2/settings.xml && \
-    echo "    <password>${CODEARTIFACT_AUTH_TOKEN}</password>" >> /root/.m2/settings.xml && \
-    echo "  </server>" >> /root/.m2/settings.xml && \
-    echo "</servers>" >> /root/.m2/settings.xml && \
-    echo "<profiles>" >> /root/.m2/settings.xml && \
-    echo "  <profile>" >> /root/.m2/settings.xml && \
-    echo "    <id>assyvajrala-marvel</id>" >> /root/.m2/settings.xml && \
-    echo "    <activation>" >> /root/.m2/settings.xml && \
-    echo "      <activeByDefault>true</activeByDefault>" >> /root/.m2/settings.xml && \
-    echo "    </activation>" >> /root/.m2/settings.xml && \
-    echo "    <repositories>" >> /root/.m2/settings.xml && \
-    echo "      <repository>" >> /root/.m2/settings.xml && \
-    echo "        <id>assyvajrala-marvel</id>" >> /root/.m2/settings.xml && \
-    echo "        <url>https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/</url>" >> /root/.m2/settings.xml && \
-    echo "      </repository>" >> /root/.m2/settings.xml && \
-    echo "    </repositories>" >> /root/.m2/settings.xml && \
-    echo "  </profile>" >> /root/.m2/settings.xml && \
-    echo "</profiles>" >> /root/.m2/settings.xml
+    echo "<settings>" > /root/.m2/settings.xml && \
+    echo "  <servers>" >> /root/.m2/settings.xml && \
+    echo "    <server>" >> /root/.m2/settings.xml && \
+    echo "      <id>assyvajrala-marvel</id>" >> /root/.m2/settings.xml && \
+    echo "      <username>aws</username>" >> /root/.m2/settings.xml && \
+    echo "      <password>\${CODEARTIFACT_AUTH_TOKEN}</password>" >> /root/.m2/settings.xml && \
+    echo "    </server>" >> /root/.m2/settings.xml && \
+    echo "  </servers>" >> /root/.m2/settings.xml && \
+    echo "  <profiles>" >> /root/.m2/settings.xml && \
+    echo "    <profile>" >> /root/.m2/settings.xml && \
+    echo "      <id>assyvajrala-marvel</id>" >> /root/.m2/settings.xml && \
+    echo "      <activation>" >> /root/.m2/settings.xml && \
+    echo "        <activeByDefault>true</activeByDefault>" >> /root/.m2/settings.xml && \
+    echo "      </activation>" >> /root/.m2/settings.xml && \
+    echo "      <repositories>" >> /root/.m2/settings.xml && \
+    echo "        <repository>" >> /root/.m2/settings.xml && \
+    echo "          <id>assyvajrala-marvel</id>" >> /root/.m2/settings.xml && \
+    echo "          <url>https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/</url>" >> /root/.m2/settings.xml && \
+    echo "        </repository>" >> /root/.m2/settings.xml && \
+    echo "      </repositories>" >> /root/.m2/settings.xml && \
+    echo "    </profile>" >> /root/.m2/settings.xml && \
+    echo "  </profiles>" >> /root/.m2/settings.xml && \
+    echo "</settings>" >> /root/.m2/settings.xml
+
 
 
 
