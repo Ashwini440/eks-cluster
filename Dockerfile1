@@ -33,29 +33,45 @@ RUN aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID} && \
 
 # Authenticate to AWS CodeArtifact and get the authorization token
 RUN TOKEN=$(aws codeartifact get-authorization-token --domain assyvajrala --domain-owner 688567283917 --region us-west-2 --query authorizationToken --output text) && \
-    echo $TOKEN
+    echo "AWS CodeArtifact Token: $TOKEN"  # Debugging token value
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the Maven settings file (this is important for the authentication to work)
-COPY settings.xml /var/lib/jenkins/.m2/settings.xml
+# Create Maven settings directory for user (ensure the directory exists)
+RUN mkdir -p /root/.m2
 
-# Configure the Maven repository in the settings.xml file
-RUN echo "<servers> \
-    <server> \
-        <id>marvel</id> \
-        <username>AWS</username> \
-        <password>${TOKEN}</password> \
-    </server> \
-</servers>" > /var/lib/jenkins/.m2/settings.xml
+# Copy the Maven settings file dynamically or use an inline echo to configure it
+RUN echo "<settings>\
+    <servers>\
+        <server>\
+            <id>assyvajrala-marvel</id>\
+            <username>aws</username>\
+            <password>${TOKEN}</password>\
+        </server>\
+    </servers>\
+    <profiles>\
+        <profile>\
+            <id>assyvajrala-marvel</id>\
+            <activation>\
+                <activeByDefault>true</activeByDefault>\
+            </activation>\
+            <repositories>\
+                <repository>\
+                    <id>assyvajrala-marvel</id>\
+                    <url>https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/</url>\
+                </repository>\
+            </repositories>\
+        </profile>\
+    </profiles>\
+</settings>" > /root/.m2/settings.xml
 
 # Download the specific artifact from AWS CodeArtifact using Maven
 RUN mvn dependency:get -DrepoUrl=https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/ \
     -Dartifact=com.assy.com:cluster_jar:1.0-20250305.103220-1
 
 # Copy the JAR file from the Maven repository to the container
-RUN cp ~/.m2/repository/com/assy/com/cluster_jar/1.0-20250305.103220-1/cluster_jar-1.0-20250305.103220-1.jar /app/cluster_jar.jar
+RUN cp /root/.m2/repository/com/assy/com/cluster_jar/1.0-20250305.103220-1/cluster_jar-1.0-20250305.103220-1.jar /app/cluster_jar.jar
 
 # Run the JAR file
-ENTRYPOINT ["java", "-jar", "cluster_jar.jar"]
+ENTRYPOINT ["java", "-jar", "/app/cluster_jar.jar"]
