@@ -52,7 +52,7 @@ RUN mkdir -p /root/.m2 && \
     echo "  <server>" >> /root/.m2/settings.xml && \
     echo "    <id>assyvajrala-marvel</id>" >> /root/.m2/settings.xml && \
     echo "    <username>aws</username>" >> /root/.m2/settings.xml && \
-    echo "    <password>${env.CODEARTIFACT_AUTH_TOKEN}</password>" >> /root/.m2/settings.xml && \
+    echo "    <password>${CODEARTIFACT_AUTH_TOKEN}</password>" >> /root/.m2/settings.xml && \
     echo "  </server>" >> /root/.m2/settings.xml && \
     echo "</servers>" >> /root/.m2/settings.xml && \
     echo "<profiles>" >> /root/.m2/settings.xml && \
@@ -69,6 +69,7 @@ RUN mkdir -p /root/.m2 && \
     echo "    </repositories>" >> /root/.m2/settings.xml && \
     echo "  </profile>" >> /root/.m2/settings.xml && \
     echo "</profiles>" >> /root/.m2/settings.xml
+
 
 # Run Maven to build the project or fetch artifacts
 RUN mvn clean install
