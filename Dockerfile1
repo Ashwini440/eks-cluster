@@ -71,6 +71,7 @@ RUN mkdir -p /root/.m2 && \
     echo "</profiles>" >> /root/.m2/settings.xml
 
 
+
 # Run Maven to build the project or fetch artifacts
 RUN mvn clean install
 WORKDIR /app
