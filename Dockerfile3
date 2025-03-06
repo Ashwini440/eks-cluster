@@ -83,7 +83,7 @@ RUN aws codeartifact get-package-version-asset \
    --debug | tee /app/cluster_jar-1.0-20250305.105648-2.jar
 # Verify the JAR file was downloaded successfully
 RUN ls -l /app/
-RUN file /app/app.jar 
-RUN chmod +r /app/cluster_jar-1.0-20250305.105648-2.jar
+
+RUN chmod +rx /app/cluster_jar-1.0-20250305.105648-2.jar
 EXPOSE 8084
 CMD ["sh", "-c", "while true; do java -jar /app/cluster_jar-1.0-20250305.105648-2.jar; sleep 5; done"]
