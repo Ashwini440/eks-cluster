@@ -1,0 +1,16 @@
+# Use a lightweight OpenJDK image
+FROM openjdk:17-jdk-slim
+
+# Set working directory
+WORKDIR /app
+RUN curl -o /app/app.jar "https://your-direct-download-url.com/cluster_jar-1.0-20250305.103220-1.jar"
+
+# Download the JAR from Nexus repo
+#ADD https://us-west-2.console.aws.amazon.com/codesuite/codeartifact/d/688567283917/assyvajrala/r/marvel/p/maven/com.assy.com/cluster_jar/versions?region=us-west-2
+#ADD https://us-west-2.console.aws.amazon.com/codesuite/codeartifact/d/688567283917/assyvajrala/r/marvel/p/maven/com.assy.com/cluster_jar/v/1.0-20250305.103220-1?region=us-west-2 /app/app.jar
+
+# Expose the port your app runs on (if applicable)
+EXPOSE 8084
+
+# Run the JAR
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
