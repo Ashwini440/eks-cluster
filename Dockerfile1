@@ -77,10 +77,10 @@ RUN aws codeartifact get-package-version-asset \
   --package-version 1.0-20250305.103220-1 \
   --region us-west-2 \
   --asset cluster_jar-1.0-20250305.103220-1.jar \
- # --outfile /app/cluster_jar-1.0-20250305.103220-1.jar \
-  --format json \
-  --debug > /app/cluster_jar-1.0-20250305.103220-1.jar
-
+  --outfile /app/cluster_jar-1.0-20250305.103220-1.jar \
+ # --format json \
+  --debug 
+ # --debug | tee /app/cluster_jar-1.0-20250305.103220-1.jar
 
 # Expose the port your application will run on
 EXPOSE 8081
