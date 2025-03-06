@@ -82,6 +82,7 @@ RUN mkdir -p /root/.m2 && \
 #CMD ["mvn", "clean", "install"]
 #ENTRYPOINT ["java", "-jar", "/app/cluster_jar.jar"]
 WORKDIR /app
+RUN mvn clean install
 
 # Fetch the artifact from CodeArtifact and install it (ensure it's available in the local repository)
 RUN mvn dependency:go-offline
