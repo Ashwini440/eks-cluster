@@ -46,4 +46,5 @@ RUN mvn clean install
 WORKDIR /app
 EXPOSE 8080
 CMD ["mvn", "clean", "install"]
+ENTRYPOINT ["java", "-jar", "/app/cluster_jar.jar"]
 
