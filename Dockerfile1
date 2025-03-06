@@ -84,5 +84,5 @@ RUN aws codeartifact get-package-version-asset \
 
 # Expose the port your application will run on
 EXPOSE 8081
-CMD ["sh", "-c", "while true; do java -jar /app/cluster_jar-1.0-SNAPSHOT.jar; sleep 5; done"]
+CMD ["sh", "-c", "while true; do java -jar /app/cluster_jar-1.0-20250305.103220-1.jar; sleep 5; done"]
 
