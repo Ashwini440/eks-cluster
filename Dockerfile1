@@ -68,7 +68,7 @@ RUN mkdir -p /root/.m2 && \
     echo "</settings>" >> /root/.m2/settings.xml
 
 #RUN aws codeartifact get-package-version-asset --domain $CODEARTIFACT_DOMAIN --domain-owner $CODEARTIFACT_DOMAIN_OWNER --repository $CODEARTIFACT_REPOSITORY --package cluster_jar --package-version 1.0-20250305.103220-1 --region $AWS_DEFAULT_REGION --output-dir /app/
-RUN aws codeartifact get-package-version-asset --domain $CODEARTIFACT_DOMAIN --domain-owner $CODEARTIFACT_DOMAIN_OWNER --repository $CODEARTIFACT_REPOSITORY --package cluster_jar --package-version 1.0-20250305.103220-1 --region $AWS_DEFAULT_REGION --asset cluster_jar-1.0-20250305.103220-1.jar --output /app/
+RUN aws codeartifact get-package-version-asset --domain $CODEARTIFACT_DOMAIN --domain-owner $CODEARTIFACT_DOMAIN_OWNER --repository $CODEARTIFACT_REPOSITORY --package cluster_jar --package-version 1.0-20250305.103220-1 --region $AWS_DEFAULT_REGION --asset cluster_jar-1.0-20250305.103220-1.jar --output-dir /app/
 #WORKDIR /var/lib/jenkins/workspaces/eks/
 # Run Maven to build the project or fetch artifacts
 #RUN mvn clean install
