@@ -31,21 +31,31 @@ RUN aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID} && \
     aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY} && \
     aws configure set region ${AWS_DEFAULT_REGION}
 
-# Configure AWS CodeArtifact repository for Maven
-RUN aws codeartifact login --repository marvel --domain assyvajrala --region us-west-2 --tool maven
+# Authenticate to AWS CodeArtifact and get the authorization token (optional, depends on your use case)
+RUN TOKEN=$(aws codeartifact get-authorization-token --domain assyvajrala --domain-owner 688567283917 --region us-west-2 --query authorizationToken --output text) && \
+    echo "AWS CodeArtifact Token: $TOKEN"  # Debugging token value
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the Maven settings file (this is important for the authentication to work)
-#COPY settings.xml /root/.m2/settings.xml
+# Create Maven settings directory in the container
+ENV MAVEN_USER_HOME=/app/.m2
+RUN mkdir -p /app/.m2
+
+# Copy the existing settings.xml file from Jenkins into the Docker image
+# Assuming the settings.xml file is at /var/lib/jenkins/.m2/settings.xml on the host
+# You need to adjust this path depending on where your settings.xml is located
+COPY /var/lib/jenkins/.m2/settings.xml /app/.m2/settings.xml
+
+# Verify that the settings.xml file was correctly copied into the container
+RUN cat /app/.m2/settings.xml  # Debugging step to ensure the settings.xml is correctly written
 
 # Download the specific artifact from AWS CodeArtifact using Maven
 RUN mvn dependency:get -DrepoUrl=https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/ \
     -Dartifact=com.assy.com:cluster_jar:1.0-20250305.103220-1
 
 # Copy the JAR file from the Maven repository to the container
-RUN cp ~/.m2/repository/com/assy/com/cluster_jar/1.0-20250305.103220-1/cluster_jar-1.0-20250305.103220-1.jar /app/cluster_jar.jar
+RUN cp /app/.m2/repository/com/assy/com/cluster_jar/1.0-20250305.103220-1/cluster_jar-1.0-20250305.103220-1.jar /app/cluster_jar.jar
 
 # Run the JAR file
-ENTRYPOINT ["java", "-jar", "cluster_jar.jar"]
+ENTRYPOINT ["java", "-jar", "/app/cluster_jar.jar"]
