@@ -72,7 +72,7 @@ RUN echo "<settings>\
 RUN cat /var/lib/jenkins/.m2/settings.xml  # Debugging step to ensure the settings.xml is correctly written
 
 # Download the specific artifact from AWS CodeArtifact using Maven
-RUN mvn -X dependency:get -DrepoUrl=https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/ \
+RUN mvn dependency:get -DrepoUrl=https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/ \
     -Dartifact=com.assy.com:cluster_jar:1.0-20250305.103220-1
 
 # Copy the JAR file from the Maven repository to the container
