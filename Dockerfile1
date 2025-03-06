@@ -43,6 +43,7 @@ RUN mkdir -p /root/.m2 && \
 
 # Run Maven to build the project or fetch artifacts
 RUN mvn clean install
+WORKDIR /app
 EXPOSE 8080
 CMD ["mvn", "clean", "install"]
 
