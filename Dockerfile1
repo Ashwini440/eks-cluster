@@ -68,6 +68,7 @@ RUN mkdir -p /root/.m2 && \
     echo "</settings>" >> /root/.m2/settings.xml
 
 WORKDIR /app
+RUN mkdir -p /app
 RUN aws codeartifact get-package-version-asset \
   --domain assyvajrala \
   --domain-owner 688567283917 \
@@ -77,8 +78,7 @@ RUN aws codeartifact get-package-version-asset \
   --region us-west-2 \
   --asset cluster_jar-1.0-20250305.103220-1.jar \
   --output json \
-  --format json \
-  --outfile /app/cluster_jar-1.0-20250305.103220-1.jar
+  --format json > /app/cluster_jar-1.0-20250305.103220-1.jar
 
 
 
