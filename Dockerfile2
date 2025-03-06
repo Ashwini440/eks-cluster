@@ -42,10 +42,8 @@ WORKDIR /app
 ENV MAVEN_USER_HOME=/app/.m2
 RUN mkdir -p /app/.m2
 
-# Copy the existing settings.xml file from Jenkins into the Docker image
-# Assuming the settings.xml file is at /var/lib/jenkins/.m2/settings.xml on the host
-# You need to adjust this path depending on where your settings.xml is located
-COPY /var/lib/jenkins/.m2/settings.xml /app/.m2/settings.xml
+# Copy the settings.xml file from the build context (current directory) into the container
+COPY settings.xml /app/.m2/settings.xml
 
 # Verify that the settings.xml file was correctly copied into the container
 RUN cat /app/.m2/settings.xml  # Debugging step to ensure the settings.xml is correctly written
