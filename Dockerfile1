@@ -42,6 +42,7 @@ WORKDIR /app
 ENV MAVEN_USER_HOME=/app/.m2
 RUN mkdir -p /app/.m2
 COPY settings.xml /app/.m2/settings.xml
+RUN ls -alh .
 
 # Copy the Maven settings file dynamically or use an inline echo to configure it
 RUN echo "<settings>\
