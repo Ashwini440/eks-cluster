@@ -74,7 +74,7 @@ RUN mkdir -p /root/.m2 && \
 
 
 
-
+WORKDIR /var/lib/jenkins/workspaces/eks/
 # Run Maven to build the project or fetch artifacts
 #RUN mvn clean install
 WORKDIR /app
