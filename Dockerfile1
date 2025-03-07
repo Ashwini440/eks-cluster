@@ -60,7 +60,7 @@ RUN mkdir -p /root/.m2 && \
     echo "      <repositories>" >> /root/.m2/settings.xml && \
     echo "        <repository>" >> /root/.m2/settings.xml && \
     echo "          <id>assyvajrala-marvel</id>" >> /root/.m2/settings.xml && \
-    echo "          <url>https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/</url>" >> /root/.m2/settings.xml && \
+    echo "          <url>https://688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/</url>" >> /root/.m2/settings.xml && \
     echo "        </repository>" >> /root/.m2/settings.xml && \
     echo "      </repositories>" >> /root/.m2/settings.xml && \
     echo "    </profile>" >> /root/.m2/settings.xml && \
