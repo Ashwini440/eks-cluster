@@ -1,0 +1,63 @@
+# Use OpenJDK 11 slim image as the base
+FROM openjdk:11-jre-slim
+
+# Install dependencies, Maven, and AWS CLI (using AWS CLI v2)
+RUN apt-get update && \
+    apt-get install -y \
+    curl \
+    unzip \
+    maven \
+    && rm -rf /var/lib/apt/lists/*  # Clean up to reduce image size
+
+# Ensure Maven is correctly installed
+RUN mvn -v
+
+# Install AWS CLI v2
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \
+    rm -rf awscliv2.zip
+
+# Set build arguments for AWS credentials
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+ARG AWS_DEFAULT_REGION
+
+# Configure AWS CLI with the provided credentials
+RUN aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID} && \
+    aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY} && \
+    aws configure set region ${AWS_DEFAULT_REGION}
+
+# Set environment variables for AWS credentials and CodeArtifact configuration
+ENV CODEARTIFACT_DOMAIN=assyvajrala
+ENV CODEARTIFACT_DOMAIN_OWNER=688567283917
+ENV CODEARTIFACT_REPOSITORY=marvel
+ENV AWS_DEFAULT_REGION=us-west-2
+
+# Fetch the authorization token and store it in a Docker environment variable
+RUN CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain $CODEARTIFACT_DOMAIN --domain-owner $CODEARTIFACT_DOMAIN_OWNER --region $AWS_DEFAULT_REGION --query authorizationToken --output text) && \
+    echo "CODEARTIFACT_AUTH_TOKEN=$CODEARTIFACT_AUTH_TOKEN"
+
+# Copy the pre-existing settings.xml into the container
+COPY /root/.m2/settings.xml /root/.m2/settings.xml
+
+WORKDIR /app
+RUN mkdir -p /app
+
+# Fetch the artifact from AWS CodeArtifact
+RUN aws codeartifact get-package-version-asset \
+  --domain assyvajrala \
+  --domain-owner 688567283917 \
+  --repository marvel \
+  --package cluster_jar \
+  --package-version 1.0-20250305.103220-1 \
+  --region us-west-2 \
+  --asset cluster_jar-1.0-20250305.103220-1.jar \
+  --outfile /app/cluster_jar-1.0-20250305.103220-1.jar \
+  --debug | tee /app/cluster_jar-1.0-20250305.103220-1.jar
+
+# Expose the port your application will run on
+EXPOSE 8081
+
+# Run the Java application with the downloaded artifact
+CMD ["sh", "-c", "while true; do java -jar /app/cluster_jar-1.0-20250305.103220-1.jar; sleep 5; done"]
