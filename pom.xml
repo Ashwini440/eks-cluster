@@ -104,10 +104,11 @@
 
 
     <repositories>
-        <repository>
-            <id>aws-codeartifact</id>
-            <url>https://assyvajrala-us-west-2.d.codeartifact.aws.amazon.com/maven/marvel/https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel
-        </repository>
-    </repositories>
+    <repository>
+        <id>aws-codeartifact</id>
+        <url>https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/</url>
+    </repository>
+   </repositories>
+
 
 </project>
