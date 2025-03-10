@@ -56,6 +56,23 @@ pipeline {
             sh 'mvn clean deploy -DskipTests'
             }
         }
+        stage('Build') {
+            steps {
+               withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                sh '''docker build \\
+  --build-arg AWS_ACCESS_KEY_ID= \\
+  --build-arg AWS_SECRET_ACCESS_KEY= \\
+  --build-arg AWS_DEFAULT_REGION=us-west-2 \\
+   --no-cache \\
+  -t ocean -f Dockerfile2 .
+'''
+                                     
+                }
+            }
+        }
+
+    }
+}
         stage('Docker Image Build') {
             steps {
                 sh 'docker build -t marvel .'
