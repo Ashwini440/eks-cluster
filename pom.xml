@@ -95,18 +95,13 @@
 
     <!-- ✅ Nexus Repository Configuration -->
     <distributionManagement>
-        <repository>
-            <id>assyvajrala-marvel</id> <!-- Repository ID, which must be unique -->
-            <name>assyvajrala-marvel</name> <!-- Name of the repository -->
-            <url>https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/</url> <!-- CodeArtifact repository URL -->
-        </repository>
-
-        <!-- ✅ AWS CodeArtifact Repository Configuration -->
-        <repository>
-            <id>aws-codeartifact</id>
-            <url>https://assyvajrala-us-west-2.d.codeartifact.aws.amazon.com/maven/marvel/https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel
-        </repository>
+    <repository>
+        <id>aws-codeartifact</id>
+        <name>AWS CodeArtifact Repository</name>
+        <url>https://assyvajrala-688567283917.d.codeartifact.us-west-2.amazonaws.com/maven/marvel/</url>
+    </repository>
     </distributionManagement>
+
 
     <repositories>
         <repository>
