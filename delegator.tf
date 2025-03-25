@@ -1,18 +1,3 @@
-resource "time_sleep" "wait_for_eks" {
-  depends_on = [aws_eks_cluster.eks]
-  create_duration = "120s"  # Waits 2 minutes before proceeding
-}
-
-data "aws_eks_cluster" "eks" {
-  name       = var.eks_cluster_name
-  depends_on = [time_sleep.wait_for_eks]  # Ensures delay before reading
-}
-
-data "aws_eks_cluster_auth" "eks" {
-  name       = var.eks_cluster_name
-  depends_on = [time_sleep.wait_for_eks]  # Ensures delay before reading
-}
-
 data "aws_caller_identity" "current" {}
 data "aws_eks_cluster" "eks" {
   name = var.eks_cluster_name
