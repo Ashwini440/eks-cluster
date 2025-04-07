@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: marvel-service-green
+  annotations:
+    harness.io/green-service: "true"
+spec:
+  selector:
+    app: marvel
+    version: green  # Initially pointing to Blue
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8081
+  type: LoadBalancer
