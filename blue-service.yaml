@@ -7,9 +7,10 @@ metadata:
 spec:
   selector:
     app: marvel
-    version: blue  # Initially pointing to Blue
+    version: blue
   ports:
     - protocol: TCP
       port: 80
       targetPort: 8081
   type: LoadBalancer
+
