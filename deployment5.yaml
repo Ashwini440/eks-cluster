@@ -22,6 +22,6 @@ spec:
     spec:
       containers:
         - name: marvel
-          image: nginx
+          image: 688567283917.dkr.ecr.us-east-1.amazonaws.com/marvel:v2
           ports:
             - containerPort: 8081
