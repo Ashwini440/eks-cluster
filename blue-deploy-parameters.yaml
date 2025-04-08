@@ -18,6 +18,6 @@ spec:
     spec:
       containers:
         - name: marvel-blue
-          image: httpd
+          image: 688567283917.dkr.ecr.us-east-1.amazonaws.com/marvel:${version}
           ports:
             - containerPort: 8081
