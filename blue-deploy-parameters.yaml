@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: <+pipeline.variables.color>-deployment
+  name: <+stage.variables.color>-deployment
   labels:
-    harness.io/color: <+pipeline.variables.color>
+    harness.io/color: <+stage.variables.color>
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: <+pipeline.variables.app_name>
-      version: <+pipeline.variables.color>
+      app: <+stage.variables.app>
+      version: <+stage.variables.color>
   template:
     metadata:
       labels:
-        app: <+pipeline.variables.app_name>
-        version: <+pipeline.variables.color>
+        app: <+stage.variables.app>
+        version: <+stage.variables.color>
     spec:
       containers:
-        - name: <+pipeline.variables.app_name>-<+pipeline.variables.color>
-          image: 688567283917.dkr.ecr.us-east-1.amazonaws.com/<+pipeline.variables.app_name>:<+pipeline.variables.version>
+        - name: <+stage.variables.app>-<+stage.variables.color>
+          image: 688567283917.dkr.ecr.us-east-1.amazonaws.com/<+stage.variables.app_name>:<+stage.variables.version>
           ports:
             - containerPort: 8081
