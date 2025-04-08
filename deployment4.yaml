@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: marvel
-          image: httpd
+          image: 688567283917.dkr.ecr.us-east-1.amazonaws.com/marvel:v1
           ports:
             - containerPort: 8081
 
