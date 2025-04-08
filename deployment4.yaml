@@ -2,9 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: blue-deployment
-  labels:
-    harness.io/color: blue  # or green during next deploy
-
+  
 spec:
   replicas: 3
   selector:
