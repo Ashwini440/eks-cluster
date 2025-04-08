@@ -4,7 +4,7 @@ kind: Service
 metadata:
   name: marvel-service-green
   annotations:
-    harness.io/green-service: "true"
+    harness.io/stage-service: "true"
 spec:
   selector:
     app: marvel
