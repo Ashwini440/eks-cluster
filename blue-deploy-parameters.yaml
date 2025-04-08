@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: blue-deployment
+  name: ${color}-deployment
   labels:
-    harness.io/color: blue
+    harness.io/color: ${color}
 spec:
   replicas: 1
   selector:
@@ -17,7 +17,7 @@ spec:
         version: ${color}
     spec:
       containers:
-        - name: marvel-blue
-          image: 688567283917.dkr.ecr.us-east-1.amazonaws.com/marvel:${version}
+        - name: ${app_name}-${color}
+          image: 688567283917.dkr.ecr.us-east-1.amazonaws.com/${app_name}:${version}
           ports:
             - containerPort: 8081
