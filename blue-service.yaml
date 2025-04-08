@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: marvel-service-blue
   annotations:
-    harness.io/blue-service: "true"
+    harness.io/primary-service: "true"
 spec:
   selector:
     app: marvel
