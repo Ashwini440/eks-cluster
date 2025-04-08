@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blue-deployment
+  labels:
+    harness.io/color: blue
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${app_name}
+      version: ${color}
+  template:
+    metadata:
+      labels:
+        app: ${app_name}
+        version: ${color}
+    spec:
+      containers:
+        - name: marvel-blue
+          image: httpd
+          ports:
+            - containerPort: 8081
