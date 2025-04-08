@@ -18,6 +18,6 @@ spec:
     spec:
       containers:
         - name: <+stage.variables.app>-<+stage.variables.color>
-          image: 688567283917.dkr.ecr.us-east-1.amazonaws.com/<+stage.variables.app_name>:<+stage.variables.version>
+          image: 688567283917.dkr.ecr.us-east-1.amazonaws.com/<+stage.variables.app>:<+stage.variables.version>
           ports:
             - containerPort: 8081
