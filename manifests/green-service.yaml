@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: marvel-service-green
+  annotations:
+    harness.io/stage-service: "true"
+spec:
+  selector:
+    app: marvel
+    version: green
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8081
+  type: LoadBalancer
