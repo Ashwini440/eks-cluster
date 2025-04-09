@@ -1,13 +1,13 @@
 replicaCount: 1
 
 app:
-  name: marvel
-  version: v1
-  color: blue
+  name: <+stage.variables.app>
+  version: <+stage.variables.version>
+  color: <+stage.variables.color>
 
 image:
-  repository: 688567283917.dkr.ecr.us-east-1.amazonaws.com/marvel
-  tag: v1
+  repository: 688567283917.dkr.ecr.us-east-1.amazonaws.com/<+stage.variables.app>
+  tag: <+stage.variables.version>
   pullPolicy: IfNotPresent
 
 service:
