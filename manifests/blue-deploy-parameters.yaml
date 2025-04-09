@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: <+stage.variables.color>-deployment
+  name: blue-deployment
   labels:
-    harness.io/color: <+stage.variables.color>
+    harness.io/color: blue
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: <+stage.variables.app>
-      version: <+stage.variables.color>
+      app: marvel
+      version: v1
   template:
     metadata:
       labels:
-        app: <+stage.variables.app>
-        version: <+stage.variables.color>
+        app: marvel
+        version: v1
     spec:
       containers:
-        - name: <+stage.variables.app>-<+stage.variables.color>
-          image: 688567283917.dkr.ecr.us-east-1.amazonaws.com/<+stage.variables.app>:<+stage.variables.version>
+        - name: marvel-blue
+          image: 688567283917.dkr.ecr.us-east-1.amazonaws.com/marvel:v1
           ports:
             - containerPort: 8081
