@@ -10,6 +10,6 @@ spec:
     version: blue
   ports:
     - protocol: TCP
-      port: 
-      targetPort: 8081
-  type: LoadBalancer
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+  type: {{ .Values.type }}
