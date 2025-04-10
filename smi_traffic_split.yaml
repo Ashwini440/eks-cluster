@@ -34,8 +34,8 @@ spec:
     strategy: None
   versions:
     - name: v1alpha4
-      served: true
-      storage: true
+      served: false
+      storage: false
       additionalPrinterColumns:
       - name: Service
         type: string
@@ -132,8 +132,8 @@ spec:
                         description: Traffic weight value of this backend.
                         type: number
     - name: v1alpha2
-      served: true
-      storage: true
+      served: false
+      storage: false
       additionalPrinterColumns:
       - name: Service
         type: string
