@@ -1,0 +1,13 @@
+apiVersion: split.smi-spec.io/v1alpha2
+kind: TrafficSplit
+metadata:
+  name: deploy-traffic-split
+  namespace: default
+spec:
+  service: deploy1-service  # This is the service where traffic is split from
+  backends:
+    - service: deploy1-service
+      weight: 80   # 80% of traffic to deploy1-service
+    - service: deploy2-service
+      weight: 20   # 20% of traffic to deploy2-service
+
