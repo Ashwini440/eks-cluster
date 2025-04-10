@@ -34,7 +34,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: deploy1-service-canary
+  name: deploy1-service
   annotations:
     harness.io/primary-service: "true"
     prometheus.io/scrape: "true"  # Enable scraping for this service
