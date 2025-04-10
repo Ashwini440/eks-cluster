@@ -2,6 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: deploy-v2
+  annotations:
+    harness.io/direct-apply: "true"
+
 spec:
   replicas: 2
   selector:
