@@ -29,7 +29,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/canary: "true"
     nginx.ingress.kubernetes.io/canary-weight: "20"
-    nginx.ingress.kubernetes.io/rewrite-target: / annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
     prometheus.io/scrape: "true"  # Enable scraping for this service
     prometheus.io/port: "9090" 
     
@@ -39,7 +39,7 @@ spec:
     - host: marvel.assy.com
       http:
         paths:
-          - path: /v2
+          - path: /v1
             pathType: Prefix
             backend:
               service:
