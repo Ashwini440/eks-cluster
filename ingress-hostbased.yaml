@@ -1,0 +1,42 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: marvel-host-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: v1.ashureddy.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: deploy1-service
+                port:
+                  number: 80
+
+    - host: v2.ashureddy.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: deploy2-service
+                port:
+                  number: 80
+
+
+
+
+
+In your domain registrar (where you manage DNS for ashureddy.xyz):
+
+Create A/AAAA or CNAME records for:
+
+v1.ashureddy.xyz → point to your ingress controller's LoadBalancer IP or hostname
+
+v2.ashureddy.xyz → same
