@@ -56,6 +56,7 @@ pipeline {
             sh 'mvn clean deploy -DskipTests'
             }
         }
+# This step will fetch artifact from aws codeartifact into dockerfile and builds the image. Here dockerfile to use is Dockerfile2.
         stage('Build') {
             steps {
                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
@@ -72,10 +73,12 @@ pipeline {
         }
 
     }
-}
+}       [ or ]
+
+# to buid image directly using dockerfile. Here main dockerfile to use is Dockerfile.
         stage('Docker Image Build') {
             steps {
-                sh 'docker build -t marvel .'
+                sh 'docker build -t marvel .'   
             }
         }
         
@@ -111,6 +114,7 @@ pipeline {
                 }
             }
         }
+                                [ or ]
         stage('Configure Kubeconfig') {
           steps {
             withCredentials([file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG_CONTENT')]) {
@@ -124,7 +128,7 @@ pipeline {
             }
           }
         }   
-    
+                  
         stage('Deploy to EKS') {
             steps {
                 withCredentials([aws(credentialsId: 'aws', region: 'us-west-2')]) {
