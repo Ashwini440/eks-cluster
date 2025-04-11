@@ -11,7 +11,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: marvel.assy.com
+    - host: www.ashureddy.xyz
       http:
         paths:
           - path: /v1
