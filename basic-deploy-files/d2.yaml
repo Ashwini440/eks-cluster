@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-v2
+  
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: marvel
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: marvel
+        version: v2
+    spec:
+      containers:  # ✅ Fixed indentation
+        - name: marvel-container2
+          image: 688567283917.dkr.ecr.us-east-1.amazonaws.com/marvel:v2
+          ports:
+            - containerPort: 8081
+          readinessProbe:
+            httpGet:
+              path: /  # ✅ Ensure this path exists
+              port: 8081
+            initialDelaySeconds: 60
+            periodSeconds: 10
+    #spec:
+     # revisionHistoryLimit: 5  # ✅ Change this value as needed
+
+ 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deploy2-service
+ 
+spec:
+  selector:
+    app: marvel
+    version: v2
+  ports:
+    - port: 80          # External Port
+      targetPort: 8081  # Pod Port
+  type: LoadBalancer    # ✅ Changed to LoadBalancer
